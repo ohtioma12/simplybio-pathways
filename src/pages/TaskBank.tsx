@@ -16,6 +16,7 @@ const TaskBank = () => {
   const [selectedLine, setSelectedLine] = useState<string | null>(null);
   const [selectedPart, setSelectedPart] = useState<string | null>(null);
   const [tasks] = useState<Task[]>(sampleTasks);
+  const [showFilters, setShowFilters] = useState(false);
 
   // Filter tasks based on search and filters
   const filteredTasks = tasks.filter(task => {
@@ -36,21 +37,50 @@ const TaskBank = () => {
     setSelectedPart(null);
   };
 
+  // Toggle filters visibility on mobile
+  const toggleFilters = () => {
+    setShowFilters(!showFilters);
+  };
+
   return (
     <>
       {/* Hero Section */}
       <HeroSection />
 
       {/* Task Bank Section */}
-      <section className="py-16 md:py-24">
+      <section className="py-12 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
+          {/* Mobile filters toggle */}
+          <div className="lg:hidden mb-6">
+            <button
+              onClick={toggleFilters}
+              className="w-full py-2 px-4 text-sm bg-secondary rounded-lg flex items-center justify-center"
+            >
+              <span>{showFilters ? 'Скрыть фильтры' : 'Показать фильтры'}</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`ml-2 transition-transform ${showFilters ? 'rotate-180' : ''}`}
+              >
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Filters sidebar */}
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
-              className="lg:col-span-3 space-y-8"
+              className={`lg:col-span-3 space-y-6 ${showFilters || window.innerWidth >= 1024 ? 'block' : 'hidden'}`}
             >
               <TaskFilters 
                 selectedTopic={selectedTopic}
