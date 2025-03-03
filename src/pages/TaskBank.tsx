@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import HeroSection from '@/components/task-bank/HeroSection';
 import TaskFilters from '@/components/task-bank/TaskFilters';
 import UploadTaskButton from '@/components/task-bank/UploadTaskButton';
@@ -8,6 +8,7 @@ import TaskList from '@/components/task-bank/TaskList';
 import CtaSection from '@/components/task-bank/CtaSection';
 import { sampleTasks } from '@/components/task-bank/data';
 import { Task } from '@/components/task-bank/TaskCard';
+import { ChevronDown } from 'lucide-react';
 
 const TaskBank = () => {
   // State
@@ -52,59 +53,63 @@ const TaskBank = () => {
         <div className="container mx-auto px-4 md:px-6">
           {/* Mobile filters toggle */}
           <div className="lg:hidden mb-6">
-            <button
+            <motion.button
               onClick={toggleFilters}
               className="w-full py-2 px-4 text-sm bg-secondary rounded-lg flex items-center justify-center"
+              whileHover={{ backgroundColor: "rgba(0,0,0,0.05)" }}
+              whileTap={{ scale: 0.98 }}
             >
               <span>{showFilters ? 'Скрыть фильтры' : 'Показать фильтры'}</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className={`ml-2 transition-transform ${showFilters ? 'rotate-180' : ''}`}
+              <motion.div
+                animate={{ rotate: showFilters ? 180 : 0 }}
+                transition={{ duration: 0.3 }}
               >
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </button>
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </motion.div>
+            </motion.button>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Filters sidebar */}
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-              className={`lg:col-span-3 space-y-6 ${showFilters || window.innerWidth >= 1024 ? 'block' : 'hidden'}`}
-            >
-              <TaskFilters 
-                selectedTopic={selectedTopic}
-                setSelectedTopic={setSelectedTopic}
-                selectedLine={selectedLine}
-                setSelectedLine={setSelectedLine}
-                selectedPart={selectedPart}
-                setSelectedPart={setSelectedPart}
-                resetFilters={resetFilters}
-              />
+            <AnimatePresence>
+              {(showFilters || window.innerWidth >= 1024) && (
+                <motion.div 
+                  initial={{ opacity: 0, x: -20, height: 0 }}
+                  animate={{ opacity: 1, x: 0, height: "auto" }}
+                  exit={{ opacity: 0, x: -20, height: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="lg:col-span-3 space-y-6"
+                >
+                  <TaskFilters 
+                    selectedTopic={selectedTopic}
+                    setSelectedTopic={setSelectedTopic}
+                    selectedLine={selectedLine}
+                    setSelectedLine={setSelectedLine}
+                    selectedPart={selectedPart}
+                    setSelectedPart={setSelectedPart}
+                    resetFilters={resetFilters}
+                  />
 
-              {/* Upload new task section (for admin/teacher) */}
-              <UploadTaskButton />
-            </motion.div>
+                  {/* Upload new task section (for admin/teacher) */}
+                  <UploadTaskButton />
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Tasks list */}
-            <div className="lg:col-span-9">
+            <motion.div 
+              className="lg:col-span-9"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
               <TaskList 
                 tasks={filteredTasks} 
                 searchQuery={searchQuery} 
                 setSearchQuery={setSearchQuery}
                 resetFilters={resetFilters}
               />
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>

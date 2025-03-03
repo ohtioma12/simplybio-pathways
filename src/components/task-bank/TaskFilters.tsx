@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { motion } from 'framer-motion';
 
 // Mock data for task topics
 const topics = [
@@ -45,28 +46,43 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
   resetFilters,
 }) => {
   return (
-    <div className="glass-card p-5 rounded-xl">
+    <motion.div 
+      className="glass-card p-5 rounded-xl"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
       <div className="flex justify-between items-center mb-5">
         <h3 className="font-medium flex items-center">
           <Filter className="h-4 w-4 mr-2" />
           Фильтры
         </h3>
         {(selectedTopic || selectedLine || selectedPart) && (
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={resetFilters}
-            className="text-muted-foreground text-xs"
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 500, damping: 30 }}
           >
-            Сбросить
-            <X className="ml-1 h-3 w-3" />
-          </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={resetFilters}
+              className="text-muted-foreground text-xs"
+            >
+              Сбросить
+              <X className="ml-1 h-3 w-3" />
+            </Button>
+          </motion.div>
         )}
       </div>
 
       <div className="space-y-4">
         {/* Topic filter */}
-        <div>
+        <motion.div
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+        >
           <Label htmlFor="topic">Тема</Label>
           <Select
             value={selectedTopic || ""}
@@ -84,10 +100,14 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
               ))}
             </SelectContent>
           </Select>
-        </div>
+        </motion.div>
 
         {/* Line filter */}
-        <div>
+        <motion.div
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+        >
           <Label htmlFor="line">Линия задания</Label>
           <Select
             value={selectedLine || ""}
@@ -105,10 +125,14 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
               ))}
             </SelectContent>
           </Select>
-        </div>
+        </motion.div>
 
         {/* Part filter */}
-        <div>
+        <motion.div
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.3 }}
+        >
           <Label htmlFor="part">Часть ЕГЭ</Label>
           <Select
             value={selectedPart || ""}
@@ -123,9 +147,9 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
               <SelectItem value="Часть 2">Часть 2</SelectItem>
             </SelectContent>
           </Select>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
