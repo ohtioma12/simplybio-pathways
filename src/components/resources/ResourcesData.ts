@@ -48,6 +48,9 @@ export const webinars: Webinar[] = [
   },
 ];
 
+// Function to create a BookOpen icon element
+const createBookIcon = () => <BookOpen className="h-6 w-6 text-prosto-blue" />;
+
 // Materials data
 export const materials: Material[] = [
   {
@@ -56,7 +59,7 @@ export const materials: Material[] = [
     description: 'Компактный справочник с основными формулами, терминами и концепциями молекулярной биологии и биохимии.',
     type: 'PDF',
     size: '3.2 MB',
-    icon: <BookOpen className="h-6 w-6 text-prosto-blue" />,
+    icon: createBookIcon,
     tags: ['Шпаргалка', 'Молекулярная биология', 'Биохимия']
   },
   {
@@ -65,7 +68,7 @@ export const materials: Material[] = [
     description: 'Визуальное представление генетического кода с пояснениями и примерами использования при решении задач.',
     type: 'PDF',
     size: '1.8 MB',
-    icon: <BookOpen className="h-6 w-6 text-prosto-blue" />,
+    icon: createBookIcon,
     tags: ['Генетика', 'Справочник']
   },
   {
@@ -74,7 +77,7 @@ export const materials: Material[] = [
     description: 'Схема эволюционных взаимосвязей между основными группами организмов с ключевыми точками эволюционного развития.',
     type: 'PDF',
     size: '4.5 MB',
-    icon: <BookOpen className="h-6 w-6 text-prosto-blue" />,
+    icon: createBookIcon,
     tags: ['Эволюция', 'Карта']
   },
   {
@@ -83,7 +86,7 @@ export const materials: Material[] = [
     description: 'Иллюстрированный справочник по всем системам организма человека, адаптированный для подготовки к ЕГЭ.',
     type: 'PDF',
     size: '6.7 MB',
-    icon: <BookOpen className="h-6 w-6 text-prosto-blue" />,
+    icon: createBookIcon,
     tags: ['Физиология', 'Анатомия', 'Схемы']
   },
   {
@@ -92,7 +95,7 @@ export const materials: Material[] = [
     description: 'Практические задания с решениями по всем разделам экологии из ЕГЭ по биологии.',
     type: 'PDF',
     size: '5.3 MB',
-    icon: <BookOpen className="h-6 w-6 text-prosto-blue" />,
+    icon: createBookIcon,
     tags: ['Экология', 'Практика', 'Задания']
   },
   {
@@ -101,7 +104,7 @@ export const materials: Material[] = [
     description: 'Словарь всех биологических терминов, встречающихся в ЕГЭ, с определениями и примерами использования.',
     type: 'PDF',
     size: '8.1 MB',
-    icon: <BookOpen className="h-6 w-6 text-prosto-blue" />,
+    icon: createBookIcon,
     tags: ['Словарь', 'Термины', 'Справочник']
   },
 ];

@@ -18,7 +18,7 @@ export interface Material {
   description: string;
   type: string;
   size: string;
-  icon: React.ReactNode;
+  icon: () => JSX.Element;
   tags: string[];
 }
 
@@ -41,7 +41,7 @@ const ResourcesMaterials: React.FC<ResourcesMaterialsProps> = ({ materials }) =>
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div className="rounded-full bg-prosto-blue-light/50 p-3">
-                  {material.icon}
+                  {material.icon()}
                 </div>
                 <Badge variant="outline">{material.type}</Badge>
               </div>
