@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BookOpen } from 'lucide-react';
 import { Webinar } from './ResourcesWebinars';
@@ -49,7 +48,9 @@ export const webinars: Webinar[] = [
 ];
 
 // Function to create a BookOpen icon element
-const createBookIcon = () => <BookOpen className="h-6 w-6 text-prosto-blue" />;
+export const createBookIcon = (): JSX.Element => {
+  return <BookOpen className="h-6 w-6 text-prosto-blue" />;
+};
 
 // Materials data
 export const materials: Material[] = [
