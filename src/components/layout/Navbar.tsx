@@ -46,10 +46,10 @@ const Navbar: React.FC = () => {
           {/* Logo */}
           <Link to="/" className="relative z-10">
             <img 
-              src="/lovable-uploads/937cc860-4189-4b9a-99ab-8c789a694da7.png" 
+              src="/lovable-uploads/6dcf98ba-b53c-4fca-95f2-d01226c7dd4a.png" 
               alt="ПроСТО" 
               className="h-10 md:h-12"
-              width={140}
+              width={160}
               height={48}
             />
           </Link>
