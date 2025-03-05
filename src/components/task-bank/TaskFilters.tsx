@@ -92,7 +92,7 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
               <SelectValue placeholder="Выберите тему" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Все темы</SelectItem>
+              <SelectItem value="all-topics">Все темы</SelectItem>
               {topics.map(topic => (
                 <SelectItem key={topic} value={topic}>
                   {topic}
@@ -117,7 +117,7 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
               <SelectValue placeholder="Выберите линию" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Все линии</SelectItem>
+              <SelectItem value="all-lines">Все линии</SelectItem>
               {taskLines.map(line => (
                 <SelectItem key={line} value={line}>
                   {line}
@@ -142,7 +142,7 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
               <SelectValue placeholder="Выберите часть" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Все части</SelectItem>
+              <SelectItem value="all-parts">Все части</SelectItem>
               <SelectItem value="Часть 1">Часть 1</SelectItem>
               <SelectItem value="Часть 2">Часть 2</SelectItem>
             </SelectContent>
