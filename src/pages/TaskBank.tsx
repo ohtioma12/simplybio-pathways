@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import HeroSection from '@/components/task-bank/HeroSection';
 import TaskFilters from '@/components/task-bank/TaskFilters';
@@ -18,6 +18,19 @@ const TaskBank = () => {
   const [selectedPart, setSelectedPart] = useState<string | null>(null);
   const [tasks] = useState<Task[]>(sampleTasks);
   const [showFilters, setShowFilters] = useState(false);
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
+
+  // Check screen size
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsLargeScreen(window.innerWidth >= 1024);
+    };
+    
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   // Filter tasks based on search and filters
   const filteredTasks = tasks.filter(task => {
@@ -72,7 +85,7 @@ const TaskBank = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Filters sidebar */}
             <AnimatePresence>
-              {(showFilters || window.innerWidth >= 1024) && (
+              {(showFilters || isLargeScreen) && (
                 <motion.div 
                   initial={{ opacity: 0, x: -20, height: 0 }}
                   animate={{ opacity: 1, x: 0, height: "auto" }}

@@ -49,8 +49,9 @@ const Navbar: React.FC = () => {
               src="/lovable-uploads/6dcf98ba-b53c-4fca-95f2-d01226c7dd4a.png" 
               alt="ПроСТО" 
               className="h-10 md:h-12"
-              width={160}
-              height={48}
+              width={120}
+              height={40}
+              style={{ objectFit: "contain" }}
             />
           </Link>
 

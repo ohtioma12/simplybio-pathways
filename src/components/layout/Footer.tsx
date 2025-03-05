@@ -17,8 +17,9 @@ const Footer: React.FC = () => {
                 src="/lovable-uploads/6dcf98ba-b53c-4fca-95f2-d01226c7dd4a.png" 
                 alt="ПроСТО" 
                 className="h-10"
-                width={160}
+                width={120}
                 height={40}
+                style={{ objectFit: "contain" }}
               />
             </Link>
             <p className="text-muted-foreground max-w-xs">
