@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { BookOpen, Download } from 'lucide-react';
+import React, { useState } from 'react';
+import { BookOpen, CheckCircle, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -18,16 +18,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 
 export interface Task {
   id: number;
   title: string;
   topic: string;
+  subtopic?: string;
   line: string;
   part: string;
   difficulty: string;
   description: string;
+  correctAnswer?: string;
 }
 
 interface TaskCardProps {
@@ -36,6 +40,35 @@ interface TaskCardProps {
 }
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
+  const [userAnswer, setUserAnswer] = useState('');
+  const [isAnswerChecked, setIsAnswerChecked] = useState(false);
+  const [isAnswerCorrect, setIsAnswerCorrect] = useState(false);
+
+  const handleAnswerChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setUserAnswer(e.target.value);
+    setIsAnswerChecked(false);
+  };
+
+  const checkAnswer = () => {
+    if (!userAnswer.trim()) {
+      toast.error('Пожалуйста, введите ваш ответ');
+      return;
+    }
+
+    // Simple string comparison - can be enhanced with more sophisticated matching
+    const isCorrect = task.correctAnswer && 
+      userAnswer.trim().toLowerCase() === task.correctAnswer.toLowerCase();
+    
+    setIsAnswerCorrect(isCorrect);
+    setIsAnswerChecked(true);
+    
+    if (isCorrect) {
+      toast.success('Правильный ответ!');
+    } else {
+      toast.error('Неправильный ответ. Попробуйте еще раз.');
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -47,7 +80,10 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
           <div className="flex justify-between items-start">
             <div>
               <CardTitle className="text-lg">{task.title}</CardTitle>
-              <CardDescription>{task.line} • {task.part}</CardDescription>
+              <CardDescription>
+                {task.line} • {task.part}
+                {task.subtopic && ` • ${task.subtopic}`}
+              </CardDescription>
             </div>
             <div className="text-xs font-medium px-2.5 py-1 bg-prosto-blue-light/50 text-prosto-blue rounded-full">
               {task.difficulty}
@@ -76,12 +112,58 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index }) => {
               <div className="space-y-4">
                 <div>
                   <h4 className="font-medium mb-2">Тема</h4>
-                  <p className="text-sm text-muted-foreground">{task.topic}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {task.topic}
+                    {task.subtopic && ` > ${task.subtopic}`}
+                  </p>
                 </div>
                 <div>
                   <h4 className="font-medium mb-2">Содержание задания</h4>
                   <p className="text-sm">{task.description}</p>
                 </div>
+                
+                {/* Answer interface */}
+                <div className="pt-4 border-t border-border">
+                  <h4 className="font-medium mb-2">Ваш ответ</h4>
+                  <Textarea 
+                    placeholder="Введите ваш ответ здесь..."
+                    className="mb-3"
+                    value={userAnswer}
+                    onChange={handleAnswerChange}
+                  />
+                  
+                  {isAnswerChecked && (
+                    <div className={`p-3 rounded-md mb-3 ${isAnswerCorrect ? 'bg-green-100' : 'bg-red-100'}`}>
+                      <p className={`text-sm font-medium ${isAnswerCorrect ? 'text-green-700' : 'text-red-700'}`}>
+                        {isAnswerCorrect 
+                          ? 'Правильно! Отличная работа.' 
+                          : `Неправильно. ${task.correctAnswer ? `Правильный ответ: ${task.correctAnswer}` : 'Попробуйте еще раз.'}`}
+                      </p>
+                    </div>
+                  )}
+                  
+                  <div className="flex justify-between gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        setUserAnswer('');
+                        setIsAnswerChecked(false);
+                      }}
+                    >
+                      Очистить
+                    </Button>
+                    <Button 
+                      variant="default" 
+                      size="sm"
+                      onClick={checkAnswer}
+                    >
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Проверить
+                    </Button>
+                  </div>
+                </div>
+                
                 <div className="pt-4 flex justify-end gap-2">
                   <Button variant="outline" size="sm">
                     <Download className="h-4 w-4 mr-2" />

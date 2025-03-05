@@ -11,11 +11,14 @@ import { Task } from '@/components/task-bank/TaskCard';
 import { ChevronDown } from 'lucide-react';
 
 const TaskBank = () => {
-  // State
+  // State for filters
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
+  const [selectedSubtopic, setSelectedSubtopic] = useState<string | null>(null);
   const [selectedLine, setSelectedLine] = useState<string | null>(null);
   const [selectedPart, setSelectedPart] = useState<string | null>(null);
+  
+  // State for tasks and UI
   const [tasks] = useState<Task[]>(sampleTasks);
   const [showFilters, setShowFilters] = useState(false);
   const [isLargeScreen, setIsLargeScreen] = useState(false);
@@ -37,16 +40,18 @@ const TaskBank = () => {
     const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           task.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesTopic = !selectedTopic || task.topic === selectedTopic;
+    const matchesSubtopic = !selectedSubtopic || task.subtopic === selectedSubtopic;
     const matchesLine = !selectedLine || task.line === selectedLine;
     const matchesPart = !selectedPart || task.part === selectedPart;
     
-    return matchesSearch && matchesTopic && matchesLine && matchesPart;
+    return matchesSearch && matchesTopic && matchesSubtopic && matchesLine && matchesPart;
   });
 
   // Reset all filters
   const resetFilters = () => {
     setSearchQuery('');
     setSelectedTopic(null);
+    setSelectedSubtopic(null);
     setSelectedLine(null);
     setSelectedPart(null);
   };
@@ -96,6 +101,8 @@ const TaskBank = () => {
                   <TaskFilters 
                     selectedTopic={selectedTopic}
                     setSelectedTopic={setSelectedTopic}
+                    selectedSubtopic={selectedSubtopic}
+                    setSelectedSubtopic={setSelectedSubtopic}
                     selectedLine={selectedLine}
                     setSelectedLine={setSelectedLine}
                     selectedPart={selectedPart}
