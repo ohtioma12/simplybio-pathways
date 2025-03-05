@@ -9,6 +9,7 @@ import CtaSection from '@/components/task-bank/CtaSection';
 import { sampleTasks } from '@/components/task-bank/data';
 import { Task } from '@/components/task-bank/TaskCard';
 import { ChevronDown } from 'lucide-react';
+import { toast } from 'sonner';
 
 const TaskBank = () => {
   // State for filters
@@ -19,7 +20,7 @@ const TaskBank = () => {
   const [selectedPart, setSelectedPart] = useState<string | null>(null);
   
   // State for tasks and UI
-  const [tasks] = useState<Task[]>(sampleTasks);
+  const [tasks, setTasks] = useState<Task[]>(sampleTasks);
   const [showFilters, setShowFilters] = useState(false);
   const [isLargeScreen, setIsLargeScreen] = useState(false);
 
@@ -59,6 +60,26 @@ const TaskBank = () => {
   // Toggle filters visibility on mobile
   const toggleFilters = () => {
     setShowFilters(!showFilters);
+  };
+
+  // Handle task update
+  const handleTaskUpdate = (updatedTask: Task) => {
+    setTasks(prevTasks => 
+      prevTasks.map(task => 
+        task.id === updatedTask.id ? updatedTask : task
+      )
+    );
+    toast.success('Задание успешно обновлено!');
+  };
+
+  // Handle new task addition
+  const handleNewTask = (newTask: Task) => {
+    // Generate a new unique ID
+    const newId = Math.max(...tasks.map(task => task.id), 0) + 1;
+    const taskWithId = { ...newTask, id: newId };
+    
+    setTasks(prevTasks => [...prevTasks, taskWithId]);
+    toast.success('Новое задание добавлено!');
   };
 
   return (
@@ -111,7 +132,7 @@ const TaskBank = () => {
                   />
 
                   {/* Upload new task section (for admin/teacher) */}
-                  <UploadTaskButton />
+                  <UploadTaskButton onTaskAdd={handleNewTask} />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -128,6 +149,7 @@ const TaskBank = () => {
                 searchQuery={searchQuery} 
                 setSearchQuery={setSearchQuery}
                 resetFilters={resetFilters}
+                onTaskUpdate={handleTaskUpdate}
               />
             </motion.div>
           </div>
