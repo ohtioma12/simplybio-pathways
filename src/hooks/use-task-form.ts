@@ -42,7 +42,7 @@ export const useTaskForm = (initialTask: Task) => {
     
     // When topic changes, reset subtopic
     if (name === 'topic') {
-      setTask(prev => ({ ...prev, subtopic: undefined }));
+      setTask(prev => ({ ...prev, subtopic: '' }));
     }
   };
 
