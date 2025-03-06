@@ -26,10 +26,17 @@ export const useTaskManagement = (initialTasks: Task[]) => {
     toast.success('Новое задание добавлено!');
   };
 
+  // Handle task deletion
+  const handleTaskDelete = (taskId: number) => {
+    setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+    toast.success('Задание успешно удалено!');
+  };
+
   return {
     tasks,
     setTasks,
     handleTaskUpdate,
-    handleNewTask
+    handleNewTask,
+    handleTaskDelete
   };
 };

@@ -12,7 +12,8 @@ const TaskBank = () => {
   const { 
     tasks, 
     handleTaskUpdate, 
-    handleNewTask 
+    handleNewTask,
+    handleTaskDelete
   } = useTaskManagement(sampleTasks);
 
   // Initialize task filters
@@ -61,6 +62,7 @@ const TaskBank = () => {
         toggleFilters={toggleFilters}
         isLargeScreen={isLargeScreen}
         onTaskUpdate={handleTaskUpdate}
+        onTaskDelete={handleTaskDelete}
         onTaskAdd={handleNewTask}
       />
 

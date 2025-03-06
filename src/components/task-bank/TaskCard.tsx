@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { BookOpen, CheckCircle, Download, Edit } from 'lucide-react';
+import { BookOpen, CheckCircle, Download, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -23,6 +23,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import TaskEditDialog from './TaskEditDialog';
+import TaskDeleteDialog from './TaskDeleteDialog';
 
 export interface Task {
   id: number;
@@ -41,13 +42,20 @@ interface TaskCardProps {
   task: Task;
   index: number;
   onTaskUpdate?: (updatedTask: Task) => void;
+  onTaskDelete?: (taskId: number) => void;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ task, index, onTaskUpdate }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ 
+  task, 
+  index, 
+  onTaskUpdate,
+  onTaskDelete 
+}) => {
   const [userAnswer, setUserAnswer] = useState('');
   const [isAnswerChecked, setIsAnswerChecked] = useState(false);
   const [isAnswerCorrect, setIsAnswerCorrect] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleAnswerChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setUserAnswer(e.target.value);
@@ -79,6 +87,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, onTaskUpdate }) => {
       onTaskUpdate(updatedTask);
       setShowEditDialog(false);
       toast.success('Задание успешно обновлено!');
+    }
+  };
+
+  const handleDeleteTask = () => {
+    if (onTaskDelete) {
+      onTaskDelete(task.id);
     }
   };
 
@@ -118,6 +132,17 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, onTaskUpdate }) => {
         <CardFooter className="flex justify-between">
           <span className="text-xs text-muted-foreground">{task.topic}</span>
           <div className="flex gap-2">
+            {onTaskDelete && (
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                onClick={() => setShowDeleteDialog(true)}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Удалить
+              </Button>
+            )}
             <Button 
               variant="ghost" 
               size="sm" 
@@ -224,6 +249,16 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, index, onTaskUpdate }) => {
         onClose={() => setShowEditDialog(false)}
         onSave={handleTaskUpdate}
       />
+
+      {/* Task Delete Dialog */}
+      {onTaskDelete && (
+        <TaskDeleteDialog
+          task={task}
+          isOpen={showDeleteDialog}
+          onClose={() => setShowDeleteDialog(false)}
+          onDelete={handleDeleteTask}
+        />
+      )}
     </motion.div>
   );
 };
