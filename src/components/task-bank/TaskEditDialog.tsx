@@ -110,7 +110,7 @@ const TaskEditDialog: React.FC<TaskEditDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Редактировать задание</DialogTitle>
         </DialogHeader>
@@ -292,7 +292,7 @@ const TaskEditDialog: React.FC<TaskEditDialogProps> = ({
           </div>
         </div>
         
-        <DialogFooter>
+        <DialogFooter className="sticky bottom-0 bg-background pt-2">
           <DialogClose asChild>
             <Button variant="outline">Отмена</Button>
           </DialogClose>

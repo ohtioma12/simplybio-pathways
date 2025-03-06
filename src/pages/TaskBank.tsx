@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import HeroSection from '@/components/task-bank/HeroSection';
@@ -89,7 +88,7 @@ const TaskBank = () => {
 
       {/* Task Bank Section */}
       <section className="py-12 md:py-24">
-        <div className="container mx-auto px-4 md:px-6">
+        <div className="container mx-auto px-4 md:px-6 max-w-[1400px]">
           {/* Mobile filters toggle */}
           <div className="lg:hidden mb-6">
             <motion.button
@@ -139,7 +138,7 @@ const TaskBank = () => {
 
             {/* Tasks list */}
             <motion.div 
-              className="lg:col-span-9"
+              className="lg:col-span-9 w-full"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.2 }}

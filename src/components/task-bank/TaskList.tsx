@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -21,9 +20,9 @@ const TaskList: React.FC<TaskListProps> = ({
   onTaskUpdate
 }) => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       {/* Search bar */}
-      <div className="relative">
+      <div className="relative max-w-2xl mx-auto">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
         <Input
           type="search"
@@ -43,7 +42,7 @@ const TaskList: React.FC<TaskListProps> = ({
       </div>
 
       {/* Results info and filters */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 max-w-2xl mx-auto">
         <p className="text-sm text-muted-foreground">
           {tasks.length === 0
             ? 'Заданий не найдено'
@@ -63,7 +62,7 @@ const TaskList: React.FC<TaskListProps> = ({
 
       {/* Task grid */}
       {tasks.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-7xl mx-auto">
           {tasks.map((task, index) => (
             <TaskCard 
               key={`task-${task.id}`} 
