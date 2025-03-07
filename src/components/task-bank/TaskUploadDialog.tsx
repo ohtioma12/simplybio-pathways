@@ -35,7 +35,10 @@ const TaskUploadDialog: React.FC<TaskUploadDialogProps> = ({
     handleChange,
     handleSelectChange,
     handleImageUpload,
-    removeImage
+    removeImage,
+    addAnswerField,
+    removeAnswerField,
+    updateAnswer
   } = useTaskForm({
     title: '',
     topic: '',
@@ -44,8 +47,9 @@ const TaskUploadDialog: React.FC<TaskUploadDialogProps> = ({
     part: '',
     difficulty: '',
     description: '',
-    correctAnswer: '',
+    correctAnswers: [''],
     explanation: '',
+    score: 1,
   } as Task);
 
   const handleTaskUpload = () => {
@@ -55,9 +59,22 @@ const TaskUploadDialog: React.FC<TaskUploadDialogProps> = ({
       return;
     }
 
+    // Validate that there's at least one correct answer
+    if (!newTask.correctAnswers || newTask.correctAnswers.length === 0 || 
+        newTask.correctAnswers.every(answer => !answer.trim())) {
+      toast.error('Добавьте хотя бы один правильный ответ');
+      return;
+    }
+
+    // For backward compatibility, set correctAnswer to first item in array
+    const taskToSave = {
+      ...newTask,
+      correctAnswer: newTask.correctAnswers[0]
+    };
+    
     // Create task and add it
     if (onTaskAdd) {
-      onTaskAdd(newTask as Task);
+      onTaskAdd(taskToSave as Task);
       onClose();
       resetForm(newTask);
     } else {
@@ -100,6 +117,9 @@ const TaskUploadDialog: React.FC<TaskUploadDialogProps> = ({
         handleSelectChange={handleSelectChange}
         handleImageUpload={handleImageUpload}
         removeImage={removeImage}
+        addAnswerField={addAnswerField}
+        removeAnswerField={removeAnswerField}
+        updateAnswer={updateAnswer}
       />
       
       <DialogFooter className="sticky bottom-0 bg-background pt-2">

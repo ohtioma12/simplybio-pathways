@@ -39,7 +39,10 @@ const TaskEditDialog: React.FC<TaskEditDialogProps> = ({
     handleChange,
     handleSelectChange,
     handleImageUpload,
-    removeImage
+    removeImage,
+    addAnswerField,
+    removeAnswerField,
+    updateAnswer
   } = useTaskForm(task);
 
   // Reset form when dialog opens
@@ -54,7 +57,20 @@ const TaskEditDialog: React.FC<TaskEditDialogProps> = ({
       toast.error('Диалог заблокирован. Разблокируйте для сохранения изменений.');
       return;
     }
-    onSave(editedTask);
+    
+    // Validate that there's at least one correct answer
+    if (!editedTask.correctAnswers || editedTask.correctAnswers.length === 0) {
+      toast.error('Добавьте хотя бы один правильный ответ');
+      return;
+    }
+    
+    // For backward compatibility, set correctAnswer to first item in array
+    const taskToSave = {
+      ...editedTask,
+      correctAnswer: editedTask.correctAnswers[0]
+    };
+    
+    onSave(taskToSave);
   };
 
   const toggleLock = () => {
@@ -86,6 +102,9 @@ const TaskEditDialog: React.FC<TaskEditDialogProps> = ({
           handleSelectChange={handleSelectChange}
           handleImageUpload={handleImageUpload}
           removeImage={removeImage}
+          addAnswerField={addAnswerField}
+          removeAnswerField={removeAnswerField}
+          updateAnswer={updateAnswer}
         />
         
         <DialogFooter className="sticky bottom-0 bg-background pt-2">

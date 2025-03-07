@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { CheckCircle, Download, Edit, Trash2, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -35,8 +34,10 @@ export interface Task {
   difficulty: string;
   description: string;
   correctAnswer?: string;
+  correctAnswers?: string[];
   explanation?: string;
   imageUrl?: string;
+  score?: number;
 }
 
 interface TaskCardProps {

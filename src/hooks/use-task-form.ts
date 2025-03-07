@@ -4,7 +4,15 @@ import { Task } from '@/components/task-bank/TaskCard';
 import { getAllTopics, getAllSubtopics } from '@/components/task-bank/data';
 
 export const useTaskForm = (initialTask: Task) => {
-  const [task, setTask] = useState<Task>({ ...initialTask });
+  // Ensure correctAnswers is an array
+  const taskWithAnswers: Task = {
+    ...initialTask,
+    correctAnswers: initialTask.correctAnswers || 
+      (initialTask.correctAnswer ? [initialTask.correctAnswer] : []),
+    score: initialTask.score || 1
+  };
+  
+  const [task, setTask] = useState<Task>({ ...taskWithAnswers });
   const [topics, setTopics] = useState<string[]>([]);
   const [subtopics, setSubtopics] = useState<{id: string; name: string; parentTopic: string}[]>([]);
   const [filteredSubtopics, setFilteredSubtopics] = useState<{id: string; name: string; parentTopic: string}[]>([]);
@@ -26,9 +34,30 @@ export const useTaskForm = (initialTask: Task) => {
     }
   }, [task.topic, subtopics]);
 
+  // Update score based on line selection
+  useEffect(() => {
+    if (task.line) {
+      const lineNumber = parseInt(task.line.replace('Линия ', ''), 10);
+      
+      // Set default score based on line number
+      let defaultScore = 2;
+      if ([1, 3, 4, 5, 9, 13].includes(lineNumber)) defaultScore = 1;
+      if ([22, 23, 24, 25, 26, 27, 28].includes(lineNumber)) defaultScore = 3;
+      
+      setTask(prev => ({ ...prev, score: defaultScore }));
+    }
+  }, [task.line]);
+
   // Reset form with initial task data
   const resetForm = (taskData: Task) => {
-    setTask({ ...taskData });
+    const formattedTask = {
+      ...taskData,
+      correctAnswers: taskData.correctAnswers || 
+        (taskData.correctAnswer ? [taskData.correctAnswer] : []),
+      score: taskData.score || 1
+    };
+    
+    setTask(formattedTask);
     setImagePreview(taskData.imageUrl || null);
   };
 
@@ -38,7 +67,11 @@ export const useTaskForm = (initialTask: Task) => {
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setTask(prev => ({ ...prev, [name]: value }));
+    if (name === 'score') {
+      setTask(prev => ({ ...prev, [name]: parseInt(value, 10) }));
+    } else {
+      setTask(prev => ({ ...prev, [name]: value }));
+    }
     
     // When topic changes, reset subtopic
     if (name === 'topic') {
@@ -67,6 +100,32 @@ export const useTaskForm = (initialTask: Task) => {
     setTask(prev => ({ ...prev, imageUrl: undefined }));
   };
 
+  // Methods for handling multiple correct answers
+  const addAnswerField = () => {
+    setTask(prev => ({
+      ...prev,
+      correctAnswers: [...(prev.correctAnswers || []), '']
+    }));
+  };
+
+  const removeAnswerField = (index: number) => {
+    setTask(prev => ({
+      ...prev,
+      correctAnswers: prev.correctAnswers?.filter((_, i) => i !== index) || []
+    }));
+  };
+
+  const updateAnswer = (index: number, value: string) => {
+    setTask(prev => {
+      const newAnswers = [...(prev.correctAnswers || [])];
+      newAnswers[index] = value;
+      return {
+        ...prev,
+        correctAnswers: newAnswers
+      };
+    });
+  };
+
   return {
     task,
     topics,
@@ -77,6 +136,9 @@ export const useTaskForm = (initialTask: Task) => {
     handleChange,
     handleSelectChange,
     handleImageUpload,
-    removeImage
+    removeImage,
+    addAnswerField,
+    removeAnswerField,
+    updateAnswer
   };
 };
