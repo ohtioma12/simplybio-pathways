@@ -52,26 +52,28 @@ const TaskBankLayout: React.FC<TaskBankLayoutProps> = ({
     <section className="py-12 bg-slate-50">
       <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Task Filters */}
-          <TaskFilters
-            selectedTopic={selectedTopic}
-            setSelectedTopic={setSelectedTopic}
-            selectedSubtopic={selectedSubtopic}
-            setSelectedSubtopic={setSelectedSubtopic}
-            selectedLine={selectedLine}
-            setSelectedLine={setSelectedLine}
-            selectedPart={selectedPart}
-            setSelectedPart={setSelectedPart}
-            resetFilters={resetFilters}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            showFilters={showFilters}
-            toggleFilters={toggleFilters}
-            isLargeScreen={isLargeScreen}
-          />
+          {/* Task Filters - Reduced width */}
+          <div className="lg:w-1/4">
+            <TaskFilters
+              selectedTopic={selectedTopic}
+              setSelectedTopic={setSelectedTopic}
+              selectedSubtopic={selectedSubtopic}
+              setSelectedSubtopic={setSelectedSubtopic}
+              selectedLine={selectedLine}
+              setSelectedLine={setSelectedLine}
+              selectedPart={selectedPart}
+              setSelectedPart={setSelectedPart}
+              resetFilters={resetFilters}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              showFilters={showFilters}
+              toggleFilters={toggleFilters}
+              isLargeScreen={isLargeScreen}
+            />
+          </div>
 
-          {/* Task List */}
-          <div className="w-full">
+          {/* Task List - Increased width */}
+          <div className="lg:w-3/4">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-gray-800">
                 Задания ({filteredTasks.length})

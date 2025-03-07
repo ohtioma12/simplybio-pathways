@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { BookOpen, CheckCircle, Download, Edit, Trash2 } from 'lucide-react';
+import { BookOpen, CheckCircle, Download, Edit, Trash2, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -35,6 +35,7 @@ export interface Task {
   difficulty: string;
   description: string;
   correctAnswer?: string;
+  explanation?: string;
   imageUrl?: string;
 }
 
@@ -56,6 +57,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const [isAnswerCorrect, setIsAnswerCorrect] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDialogLocked, setIsDialogLocked] = useState(false);
 
   const handleAnswerChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setUserAnswer(e.target.value);
@@ -96,6 +98,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
     }
   };
 
+  const toggleLock = () => {
+    setIsDialogLocked(!isDialogLocked);
+    toast.info(isDialogLocked ? 'Диалог разблокирован' : 'Диалог заблокирован');
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -129,128 +136,172 @@ const TaskCard: React.FC<TaskCardProps> = ({
             </div>
           )}
         </CardContent>
-        <CardFooter className="flex justify-between">
-          <span className="text-xs text-muted-foreground">{task.topic}</span>
-          <div className="flex gap-2">
-            {onTaskDelete && (
+        <CardFooter className="flex flex-col gap-2">
+          <div className="w-full flex justify-between items-center">
+            <span className="text-xs text-muted-foreground">{task.topic}</span>
+            <div className="flex gap-1">
+              {onTaskDelete && (
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  onClick={() => setShowDeleteDialog(true)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
               <Button 
                 variant="ghost" 
-                size="sm"
-                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                onClick={() => setShowDeleteDialog(true)}
+                size="sm" 
+                onClick={() => setShowEditDialog(true)}
               >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Удалить
+                <Edit className="h-4 w-4" />
               </Button>
-            )}
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => setShowEditDialog(true)}
-            >
-              <Edit className="h-4 w-4 mr-2" />
-              Редактировать
-            </Button>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <BookOpen className="h-4 w-4 mr-2" />
-                  Открыть
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-3xl">
-                <DialogHeader>
-                  <DialogTitle>{task.title}</DialogTitle>
-                  <DialogDescription>
-                    {task.line} • {task.part} • {task.difficulty}
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-medium mb-2">Тема</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {task.topic}
-                      {task.subtopic && ` > ${task.subtopic}`}
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium mb-2">Содержание задания</h4>
-                    <p className="text-sm">{task.description}</p>
-                    {task.imageUrl && (
-                      <div className="mt-3">
-                        <img 
-                          src={task.imageUrl} 
-                          alt={task.title} 
-                          className="w-full h-auto rounded-md object-cover max-h-64" 
-                        />
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Answer interface */}
-                  <div className="pt-4 border-t border-border">
-                    <h4 className="font-medium mb-2">Ваш ответ</h4>
-                    <Textarea 
-                      placeholder="Введите ваш ответ здесь..."
-                      className="mb-3"
-                      value={userAnswer}
-                      onChange={handleAnswerChange}
-                    />
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                    <BookOpen className="h-4 w-4" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl">
+                  <DialogHeader className="flex flex-row items-center justify-between">
+                    <div>
+                      <DialogTitle>{task.title}</DialogTitle>
+                      <DialogDescription>
+                        {task.line} • {task.part} • {task.difficulty}
+                      </DialogDescription>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      onClick={toggleLock}
+                      className={isDialogLocked ? "bg-red-100" : ""}
+                    >
+                      <Lock className={`h-4 w-4 ${isDialogLocked ? "text-red-500" : ""}`} />
+                    </Button>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-medium mb-2">Тема</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {task.topic}
+                        {task.subtopic && ` > ${task.subtopic}`}
+                      </p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium mb-2">Содержание задания</h4>
+                      <p className="text-sm">{task.description}</p>
+                      {task.imageUrl && (
+                        <div className="mt-3">
+                          <img 
+                            src={task.imageUrl} 
+                            alt={task.title} 
+                            className="w-full h-auto rounded-md object-cover max-h-64" 
+                          />
+                        </div>
+                      )}
+                    </div>
                     
-                    {isAnswerChecked && (
-                      <div className={`p-3 rounded-md mb-3 ${isAnswerCorrect ? 'bg-green-100' : 'bg-red-100'}`}>
-                        <p className={`text-sm font-medium ${isAnswerCorrect ? 'text-green-700' : 'text-red-700'}`}>
-                          {isAnswerCorrect 
-                            ? 'Правильно! Отличная работа.' 
-                            : `Неправильно. ${task.correctAnswer ? `Правильный ответ: ${task.correctAnswer}` : 'Попробуйте еще раз.'}`}
-                        </p>
+                    {/* Answer interface */}
+                    <div className="pt-4 border-t border-border">
+                      <h4 className="font-medium mb-2">Ваш ответ</h4>
+                      <Textarea 
+                        placeholder="Введите ваш ответ здесь..."
+                        className="mb-3"
+                        value={userAnswer}
+                        onChange={handleAnswerChange}
+                        disabled={isDialogLocked}
+                      />
+                      
+                      {isAnswerChecked && (
+                        <div className={`p-3 rounded-md mb-3 ${isAnswerCorrect ? 'bg-green-100' : 'bg-red-100'}`}>
+                          <p className={`text-sm font-medium ${isAnswerCorrect ? 'text-green-700' : 'text-red-700'}`}>
+                            {isAnswerCorrect 
+                              ? 'Правильно! Отличная работа.' 
+                              : `Неправильно. Попробуйте еще раз.`}
+                          </p>
+                        </div>
+                      )}
+                      
+                      {/* Correct answer section */}
+                      {isAnswerChecked && !isAnswerCorrect && task.correctAnswer && (
+                        <div className="p-3 rounded-md mb-3 bg-blue-50">
+                          <h5 className="text-sm font-medium text-blue-700 mb-1">Правильный ответ:</h5>
+                          <p className="text-sm text-blue-800">{task.correctAnswer}</p>
+                        </div>
+                      )}
+                      
+                      {/* Explanation section */}
+                      {isAnswerChecked && task.explanation && (
+                        <div className="p-3 rounded-md mb-3 bg-purple-50">
+                          <h5 className="text-sm font-medium text-purple-700 mb-1">Объяснение:</h5>
+                          <p className="text-sm text-purple-800">{task.explanation}</p>
+                        </div>
+                      )}
+                      
+                      <div className="flex justify-between gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            setUserAnswer('');
+                            setIsAnswerChecked(false);
+                          }}
+                          disabled={isDialogLocked}
+                        >
+                          Очистить
+                        </Button>
+                        <Button 
+                          variant="default" 
+                          size="sm"
+                          onClick={checkAnswer}
+                          disabled={isDialogLocked}
+                        >
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Проверить
+                        </Button>
                       </div>
-                    )}
+                    </div>
                     
-                    <div className="flex justify-between gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => {
-                          setUserAnswer('');
-                          setIsAnswerChecked(false);
-                        }}
-                      >
-                        Очистить
-                      </Button>
-                      <Button 
-                        variant="default" 
-                        size="sm"
-                        onClick={checkAnswer}
-                      >
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Проверить
+                    <div className="pt-4 flex justify-end gap-2">
+                      <Button variant="outline" size="sm" disabled={isDialogLocked}>
+                        <Download className="h-4 w-4 mr-2" />
+                        Скачать
                       </Button>
                     </div>
                   </div>
-                  
-                  <div className="pt-4 flex justify-end gap-2">
-                    <Button variant="outline" size="sm">
-                      <Download className="h-4 w-4 mr-2" />
-                      Скачать
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
         </CardFooter>
       </Card>
 
-      {/* Task Edit Dialog */}
-      <TaskEditDialog
-        task={task}
-        isOpen={showEditDialog}
-        onClose={() => setShowEditDialog(false)}
-        onSave={handleTaskUpdate}
-      />
+      {/* Task Edit Dialog with lock button */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="flex flex-row items-center justify-between">
+            <DialogTitle>Редактировать задание</DialogTitle>
+            <Button 
+              variant="outline" 
+              size="icon" 
+              onClick={toggleLock}
+              className={isDialogLocked ? "bg-red-100" : ""}
+            >
+              <Lock className={`h-4 w-4 ${isDialogLocked ? "text-red-500" : ""}`} />
+            </Button>
+          </DialogHeader>
+          
+          <TaskEditDialog
+            task={task}
+            isOpen={showEditDialog}
+            onClose={() => setShowEditDialog(false)}
+            onSave={handleTaskUpdate}
+          />
+        </DialogContent>
+      </Dialog>
 
-      {/* Task Delete Dialog */}
+      {/* Task Delete Dialog with lock button */}
       {onTaskDelete && (
         <TaskDeleteDialog
           task={task}
