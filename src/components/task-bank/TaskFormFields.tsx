@@ -171,6 +171,18 @@ const TaskFormFields: React.FC<TaskFormFieldsProps> = ({
       </div>
       
       <div>
+        <Label htmlFor="explanation">Объяснение задания</Label>
+        <Textarea 
+          id="explanation" 
+          name="explanation" 
+          value={task.explanation || ''} 
+          onChange={handleChange} 
+          rows={3}
+          placeholder="Добавьте пояснение к правильному ответу..."
+        />
+      </div>
+      
+      <div>
         <Label>Изображение</Label>
         <ImageUpload
           imagePreview={imagePreview}
