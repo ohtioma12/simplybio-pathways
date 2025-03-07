@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Container } from '@/components/ui/sidebar';
 import TaskList from './TaskList';
 import TaskFilters from './TaskFilters';
 import UploadTaskButton from './UploadTaskButton';
@@ -51,12 +50,10 @@ const TaskBankLayout: React.FC<TaskBankLayoutProps> = ({
 }) => {
   return (
     <section className="py-12 bg-slate-50">
-      <Container>
+      <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Task Filters */}
           <TaskFilters
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
             selectedTopic={selectedTopic}
             setSelectedTopic={setSelectedTopic}
             selectedSubtopic={selectedSubtopic}
@@ -66,6 +63,8 @@ const TaskBankLayout: React.FC<TaskBankLayoutProps> = ({
             selectedPart={selectedPart}
             setSelectedPart={setSelectedPart}
             resetFilters={resetFilters}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
             showFilters={showFilters}
             toggleFilters={toggleFilters}
             isLargeScreen={isLargeScreen}
@@ -87,7 +86,7 @@ const TaskBankLayout: React.FC<TaskBankLayoutProps> = ({
             />
           </div>
         </div>
-      </Container>
+      </div>
     </section>
   );
 };

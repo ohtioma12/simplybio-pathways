@@ -26,6 +26,11 @@ interface TaskFiltersProps {
   selectedPart: string | null;
   setSelectedPart: (part: string | null) => void;
   resetFilters: () => void;
+  searchQuery: string;
+  setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
+  showFilters: boolean;
+  toggleFilters: () => void;
+  isLargeScreen: boolean;
 }
 
 const TaskFilters: React.FC<TaskFiltersProps> = ({
@@ -38,6 +43,11 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
   selectedPart,
   setSelectedPart,
   resetFilters,
+  searchQuery,
+  setSearchQuery,
+  showFilters,
+  toggleFilters,
+  isLargeScreen
 }) => {
   // State for expanded topics in the list
   const [expandedTopics, setExpandedTopics] = useState<number[]>([]);
@@ -209,6 +219,23 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
               <SelectItem value="Часть 2">Часть 2</SelectItem>
             </SelectContent>
           </Select>
+        </motion.div>
+
+        {/* Search filter */}
+        <motion.div
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.4 }}
+        >
+          <Label htmlFor="search">Поиск</Label>
+          <input 
+            type="text"
+            id="search"
+            placeholder="Поиск заданий..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full border rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </motion.div>
 
         {/* Summary of selected filters */}
