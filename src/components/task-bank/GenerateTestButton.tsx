@@ -5,6 +5,7 @@ import { FileDown } from 'lucide-react';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import TestGeneratorDialog from './TestGeneratorDialog';
 import { usePermissions } from '@/hooks/use-permissions';
+import { Task } from './TaskCard';
 
 interface GenerateTestButtonProps {
   tasks: Task[];
