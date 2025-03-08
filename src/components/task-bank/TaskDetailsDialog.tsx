@@ -68,6 +68,7 @@ const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
             <DialogTitle>{task.title}</DialogTitle>
             <DialogDescription>
               {task.line} • {task.part} • {task.difficulty}
+              {task.taskCode && ` • Код: ${task.taskCode}`}
             </DialogDescription>
           </div>
           <Button 

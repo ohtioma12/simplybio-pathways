@@ -3,6 +3,7 @@ import React from 'react';
 import TaskList from './TaskList';
 import TaskFilters from './TaskFilters';
 import UploadTaskButton from './UploadTaskButton';
+import GenerateTestButton from './GenerateTestButton';
 import { Task } from './TaskCard';
 import { usePermissions } from '@/hooks/use-permissions';
 
@@ -77,11 +78,14 @@ const TaskBankLayout: React.FC<TaskBankLayoutProps> = ({
 
           {/* Task List - Increased width */}
           <div className="lg:w-3/4">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-wrap justify-between items-center mb-6 gap-2">
               <h2 className="text-2xl font-bold text-gray-800">
                 Задания ({filteredTasks.length})
               </h2>
-              {canCreateTasks && <UploadTaskButton onTaskAdd={onTaskAdd} />}
+              <div className="flex gap-2 flex-wrap">
+                <GenerateTestButton tasks={tasks} />
+                {canCreateTasks && <UploadTaskButton onTaskAdd={onTaskAdd} />}
+              </div>
             </div>
 
             {isAuthenticated ? (

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -31,6 +31,7 @@ export interface Task {
   explanation?: string;
   imageUrl?: string;
   score?: number;
+  taskCode?: string;
 }
 
 interface TaskCardProps {
@@ -49,6 +50,19 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showTaskDialog, setShowTaskDialog] = useState(false);
+  const [taskCode, setTaskCode] = useState<string>("");
+
+  // Generate task code if it doesn't exist
+  useEffect(() => {
+    if (!task.taskCode) {
+      const lineNumber = parseInt(task.line.replace('Линия ', ''), 10) || 0;
+      // Create a unique task code
+      const generatedCode = `${lineNumber.toString().padStart(2, '0')}-${(task.id % 1000).toString().padStart(3, '0')}`;
+      setTaskCode(generatedCode);
+    } else {
+      setTaskCode(task.taskCode);
+    }
+  }, [task]);
 
   const handleTaskUpdate = (updatedTask: Task) => {
     if (onTaskUpdate) {
@@ -84,8 +98,13 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 {task.subtopic && ` • ${task.subtopic}`}
               </CardDescription>
             </div>
-            <div className="text-xs font-medium px-2.5 py-1 bg-prosto-blue-light/50 text-prosto-blue rounded-full">
-              {task.difficulty}
+            <div className="flex flex-col gap-1 items-end">
+              <div className="text-xs font-medium px-2.5 py-1 bg-prosto-blue-light/50 text-prosto-blue rounded-full">
+                {task.difficulty}
+              </div>
+              <div className="text-xs font-medium px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full">
+                Код: {taskCode}
+              </div>
             </div>
           </div>
         </CardHeader>
@@ -123,7 +142,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
       {/* Task Details Dialog */}
       <TaskDetailsDialog
-        task={task}
+        task={{...task, taskCode}}
         isOpen={showTaskDialog}
         onClose={() => setShowTaskDialog(false)}
       />
