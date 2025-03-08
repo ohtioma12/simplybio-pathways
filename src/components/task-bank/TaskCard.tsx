@@ -69,16 +69,17 @@ const TaskCard: React.FC<TaskCardProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.1 }}
+      className="h-full"
     >
       <Card 
-        className="h-full hover-lift cursor-pointer" 
+        className="h-full hover-lift cursor-pointer shadow-md hover:shadow-lg transition-all" 
         onClick={() => setShowTaskDialog(true)}
       >
-        <CardHeader>
+        <CardHeader className="pb-4">
           <div className="flex justify-between items-start">
             <div>
-              <CardTitle className="text-lg">{task.title}</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-xl">{task.title}</CardTitle>
+              <CardDescription className="mt-1">
                 {task.line} • {task.part}
                 {task.subtopic && ` • ${task.subtopic}`}
               </CardDescription>
@@ -88,21 +89,28 @@ const TaskCard: React.FC<TaskCardProps> = ({
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground line-clamp-3">{task.description}</p>
+        <CardContent className="pb-6">
+          <p className="text-sm text-muted-foreground line-clamp-4 min-h-[5rem]">{task.description}</p>
           {task.imageUrl && (
-            <div className="mt-3">
+            <div className="mt-4">
               <img 
                 src={task.imageUrl} 
                 alt={task.title} 
-                className="w-full h-auto rounded-md object-cover max-h-32" 
+                className="w-full h-auto rounded-md object-cover max-h-40" 
               />
             </div>
           )}
+          {task.score && (
+            <div className="mt-4 flex items-center">
+              <span className="text-sm font-medium px-2 py-0.5 bg-muted rounded-md">
+                Баллов: {task.score}
+              </span>
+            </div>
+          )}
         </CardContent>
-        <CardFooter className="flex flex-col gap-2">
+        <CardFooter className="pt-0">
           <div className="w-full flex justify-between items-center">
-            <span className="text-xs text-muted-foreground">{task.topic}</span>
+            <span className="text-sm text-muted-foreground">{task.topic}</span>
             <TaskCardActions 
               task={task}
               onEditClick={() => setShowEditDialog(true)}
