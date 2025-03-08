@@ -4,6 +4,7 @@ import TaskList from './TaskList';
 import TaskFilters from './TaskFilters';
 import UploadTaskButton from './UploadTaskButton';
 import { Task } from './TaskCard';
+import { usePermissions } from '@/hooks/use-permissions';
 
 interface TaskBankLayoutProps {
   tasks: Task[];
@@ -48,6 +49,8 @@ const TaskBankLayout: React.FC<TaskBankLayoutProps> = ({
   onTaskDelete,
   onTaskAdd
 }) => {
+  const { canCreateTasks, isAuthenticated } = usePermissions();
+
   return (
     <section className="py-12 bg-slate-50">
       <div className="container mx-auto px-4">
@@ -78,14 +81,26 @@ const TaskBankLayout: React.FC<TaskBankLayoutProps> = ({
               <h2 className="text-2xl font-bold text-gray-800">
                 Задания ({filteredTasks.length})
               </h2>
-              <UploadTaskButton onTaskAdd={onTaskAdd} />
+              {canCreateTasks && <UploadTaskButton onTaskAdd={onTaskAdd} />}
             </div>
 
-            <TaskList 
-              tasks={filteredTasks} 
-              onTaskUpdate={onTaskUpdate} 
-              onTaskDelete={onTaskDelete}
-            />
+            {isAuthenticated ? (
+              <TaskList 
+                tasks={filteredTasks} 
+                onTaskUpdate={onTaskUpdate} 
+                onTaskDelete={onTaskDelete}
+              />
+            ) : (
+              <div className="p-8 bg-white rounded-lg shadow-md text-center">
+                <h3 className="text-xl font-semibold mb-4">Доступ ограничен</h3>
+                <p className="text-muted-foreground mb-6">
+                  Для просмотра и выполнения заданий необходимо войти в систему.
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Воспользуйтесь кнопкой "Войти" в верхнем меню.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

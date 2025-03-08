@@ -3,6 +3,7 @@ import React from 'react';
 import { Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Task } from './TaskCard';
+import { usePermissions } from '@/hooks/use-permissions';
 
 interface TaskCardActionsProps {
   task: Task;
@@ -17,6 +18,13 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
   onDeleteClick,
   hasDeletePermission
 }) => {
+  const { canEditTasks } = usePermissions();
+  
+  // If user doesn't have edit permissions, don't render any actions
+  if (!canEditTasks) {
+    return null;
+  }
+
   return (
     <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
       {hasDeletePermission && (

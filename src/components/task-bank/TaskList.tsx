@@ -3,6 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import TaskCard, { Task } from './TaskCard';
 import EmptyState from './EmptyState';
+import { usePermissions } from '@/hooks/use-permissions';
 
 interface TaskListProps {
   tasks: Task[];
@@ -15,6 +16,8 @@ const TaskList: React.FC<TaskListProps> = ({
   onTaskUpdate,
   onTaskDelete
 }) => {
+  const { canEditTasks, canDeleteTasks } = usePermissions();
+  
   if (tasks.length === 0) {
     return <EmptyState />;
   }
@@ -31,8 +34,8 @@ const TaskList: React.FC<TaskListProps> = ({
           key={task.id} 
           task={task} 
           index={index} 
-          onTaskUpdate={onTaskUpdate}
-          onTaskDelete={onTaskDelete}
+          onTaskUpdate={canEditTasks ? onTaskUpdate : undefined}
+          onTaskDelete={canDeleteTasks ? onTaskDelete : undefined}
         />
       ))}
     </motion.div>

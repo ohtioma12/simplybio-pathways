@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ConsultationButton from '@/components/ui/ConsultationButton';
+import AuthButton from '@/components/auth/AuthButton';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -71,7 +72,8 @@ const Navbar: React.FC = () => {
                 {link.label}
               </Link>
             ))}
-            <div className="ml-4">
+            <div className="ml-4 flex items-center space-x-2">
+              <AuthButton />
               <ConsultationButton />
             </div>
           </nav>
@@ -108,7 +110,8 @@ const Navbar: React.FC = () => {
                 {link.label}
               </Link>
             ))}
-            <div className="pt-2">
+            <div className="flex flex-col gap-3 pt-2">
+              <AuthButton />
               <ConsultationButton className="w-full justify-center" />
             </div>
           </nav>

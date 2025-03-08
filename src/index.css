@@ -106,10 +106,12 @@
 
 /* Reset defaults */
 #root {
+  width: 100%;
   max-width: 100%;
   margin: 0;
   padding: 0;
   text-align: left;
+  overflow-x: hidden;
 }
 
 /* Fonts */
@@ -121,4 +123,58 @@
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Responsive container fixes */
+.container {
+  width: 100%;
+  max-width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1400px;
+  }
+}
+
+/* Better mobile forms */
+input, textarea, select, button {
+  font-size: 16px; /* Prevents zoom on iOS */
+}
+
+/* Fix image overflows */
+img {
+  max-width: 100%;
+  height: auto;
 }
