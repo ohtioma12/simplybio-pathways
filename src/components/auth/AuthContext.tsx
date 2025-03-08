@@ -39,6 +39,13 @@ const MOCK_USERS = [
     name: 'Regular User',
     role: 'user' as UserRole,
   },
+  {
+    id: '3',
+    email: 'odibuda@mail.ru',
+    password: 'Odissey13',
+    name: 'Odissey',
+    role: 'admin' as UserRole,
+  },
 ];
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
