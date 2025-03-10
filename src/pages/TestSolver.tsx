@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { CheckCircle, XCircle, FileDown, ArrowLeft } from 'lucide-react';
-import { SavedTest, TaskOption, UserAnswer, TestGenerationOptions } from '@/components/task-bank/test-generator/types';
+import { SavedTest, TaskOption, UserAnswer, TestGenerationOptions, ExtendedTask } from '@/components/task-bank/test-generator/types';
 import { generateTestPdf } from '@/components/task-bank/test-generator/pdfGenerator';
 import { useAuth } from '@/components/auth/AuthContext';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -91,13 +91,20 @@ const TestSolver: React.FC = () => {
       return;
     }
     
-    const task = sampleTasks.find(t => t.id === taskId);
-    if (!task?.correctAnswers?.length) {
+    const task = sampleTasks.find(t => t.id === taskId) as ExtendedTask | undefined;
+    if (!task) {
+      toast.error('Задание не найдено');
+      return;
+    }
+    
+    // Check against correctAnswers array if it exists, or use correctAnswer as fallback
+    const correctAnswersArray = task.correctAnswers || (task.correctAnswer ? [task.correctAnswer] : []);
+    if (correctAnswersArray.length === 0) {
       toast.error('Для этого задания не указан правильный ответ');
       return;
     }
     
-    const isCorrect = task.correctAnswers.some(
+    const isCorrect = correctAnswersArray.some(
       answer => userAnswer.answer.trim().toLowerCase() === answer.toLowerCase()
     );
     
@@ -195,9 +202,15 @@ const TestSolver: React.FC = () => {
       
       <div className="space-y-6">
         {taskDetails.map((task, index) => {
-          const fullTask = sampleTasks.find(t => t.id === task.id);
+          const fullTask = sampleTasks.find(t => t.id === task.id) as ExtendedTask | undefined;
+          if (!fullTask) return null;
+          
           const userAnswer = userAnswers.find(a => a.taskId === task.id);
           const isAnswered = userAnswer?.isCorrect !== undefined;
+          
+          // Create corrected array of answers using either correctAnswers or correctAnswer
+          const correctAnswersArray = fullTask.correctAnswers || 
+            (fullTask.correctAnswer ? [fullTask.correctAnswer] : []);
           
           return (
             <Card key={task.id} className="shadow-sm">
@@ -266,10 +279,10 @@ const TestSolver: React.FC = () => {
                   />
                 </div>
                 
-                {isAnswered && !userAnswer?.isCorrect && fullTask?.correctAnswers && (
+                {isAnswered && !userAnswer?.isCorrect && correctAnswersArray.length > 0 && (
                   <div className="mt-4 p-3 bg-blue-50 rounded-md">
                     <h4 className="text-sm font-medium text-blue-800 mb-1">Правильный ответ:</h4>
-                    <p className="text-sm text-blue-900">{fullTask.correctAnswers[0]}</p>
+                    <p className="text-sm text-blue-900">{correctAnswersArray[0]}</p>
                   </div>
                 )}
                 

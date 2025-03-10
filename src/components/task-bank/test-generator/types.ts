@@ -40,3 +40,9 @@ export interface TestGenerationOptions {
   includeExplanations: boolean;
   includeAnswerKey: boolean;
 }
+
+// This is a temporary interface to ensure TestSolver.tsx has access to all task properties
+export interface ExtendedTask extends Task {
+  correctAnswers?: string[];
+  explanation?: string;
+}
