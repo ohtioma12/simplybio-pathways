@@ -11,7 +11,7 @@ import {
   CardTitle 
 } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { CheckCircle, XCircle, FileDown, ArrowLeft } from 'lucide-react';
+import { CheckCircle, XCircle, FileDown, ArrowLeft, FileCheck } from 'lucide-react';
 import { SavedTest, TaskOption, UserAnswer, TestGenerationOptions, ExtendedTask } from '@/components/task-bank/test-generator/types';
 import { generateTestPdf } from '@/components/task-bank/test-generator/pdfGenerator';
 import { useAuth } from '@/components/auth/AuthContext';
@@ -21,6 +21,7 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { sampleTasks } from '@/components/task-bank/data';
+import { Progress } from '@/components/ui/progress';
 
 const TestSolver: React.FC = () => {
   const { testId } = useParams<{ testId: string }>();
@@ -34,6 +35,8 @@ const TestSolver: React.FC = () => {
     includeExplanations: false,
     includeAnswerKey: false
   });
+  const [resultsMode, setResultsMode] = useState(false);
+  const [score, setScore] = useState({ correct: 0, total: 0 });
   
   // Load test data
   useEffect(() => {
@@ -84,43 +87,41 @@ const TestSolver: React.FC = () => {
     );
   };
   
-  const checkAnswer = (taskId: number) => {
-    const userAnswer = userAnswers.find(a => a.taskId === taskId);
-    if (!userAnswer || !userAnswer.answer.trim()) {
-      toast.error('Введите ответ перед проверкой');
+  const checkAllAnswers = () => {
+    if (userAnswers.some(a => !a.answer.trim())) {
+      toast.error('Пожалуйста, ответьте на все вопросы перед проверкой');
       return;
     }
     
-    const task = sampleTasks.find(t => t.id === taskId) as ExtendedTask | undefined;
-    if (!task) {
-      toast.error('Задание не найдено');
-      return;
-    }
+    let correctCount = 0;
+    const checkedAnswers = userAnswers.map(userAnswer => {
+      const task = sampleTasks.find(t => t.id === userAnswer.taskId) as ExtendedTask | undefined;
+      
+      if (!task) return userAnswer;
+      
+      // Check against correctAnswers array if it exists, or use correctAnswer as fallback
+      const correctAnswersArray = task.correctAnswers || (task.correctAnswer ? [task.correctAnswer] : []);
+      
+      if (correctAnswersArray.length === 0) return userAnswer;
+      
+      const isCorrect = correctAnswersArray.some(
+        answer => userAnswer.answer.trim().toLowerCase() === answer.toLowerCase()
+      );
+      
+      if (isCorrect) correctCount++;
+      
+      return { ...userAnswer, isCorrect };
+    });
     
-    // Check against correctAnswers array if it exists, or use correctAnswer as fallback
-    const correctAnswersArray = task.correctAnswers || (task.correctAnswer ? [task.correctAnswer] : []);
-    if (correctAnswersArray.length === 0) {
-      toast.error('Для этого задания не указан правильный ответ');
-      return;
-    }
+    setUserAnswers(checkedAnswers);
+    setScore({
+      correct: correctCount,
+      total: userAnswers.length
+    });
+    setResultsMode(true);
     
-    const isCorrect = correctAnswersArray.some(
-      answer => userAnswer.answer.trim().toLowerCase() === answer.toLowerCase()
-    );
-    
-    setUserAnswers(prev => 
-      prev.map(answer => 
-        answer.taskId === taskId 
-          ? { ...answer, isCorrect } 
-          : answer
-      )
-    );
-    
-    if (isCorrect) {
-      toast.success('Правильный ответ!');
-    } else {
-      toast.error('Неправильный ответ. Попробуйте еще раз.');
-    }
+    // Scroll to top to show results
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   
   const handleGeneratePdf = () => {
@@ -168,29 +169,31 @@ const TestSolver: React.FC = () => {
           </div>
           
           <div className="flex flex-col sm:flex-row gap-2">
-            <div className="flex flex-col space-y-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="pdf-explanations"
-                  checked={pdfOptions.includeExplanations}
-                  onCheckedChange={(checked) => 
-                    setPdfOptions(prev => ({ ...prev, includeExplanations: !!checked }))
-                  }
-                />
-                <label htmlFor="pdf-explanations" className="text-sm">Включить пояснения</label>
+            {!resultsMode && (
+              <div className="flex flex-col space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="pdf-explanations"
+                    checked={pdfOptions.includeExplanations}
+                    onCheckedChange={(checked) => 
+                      setPdfOptions(prev => ({ ...prev, includeExplanations: !!checked }))
+                    }
+                  />
+                  <label htmlFor="pdf-explanations" className="text-sm">Включить пояснения</label>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="pdf-answers"
+                    checked={pdfOptions.includeAnswerKey}
+                    onCheckedChange={(checked) => 
+                      setPdfOptions(prev => ({ ...prev, includeAnswerKey: !!checked }))
+                    }
+                  />
+                  <label htmlFor="pdf-answers" className="text-sm">Включить ответы</label>
+                </div>
               </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="pdf-answers"
-                  checked={pdfOptions.includeAnswerKey}
-                  onCheckedChange={(checked) => 
-                    setPdfOptions(prev => ({ ...prev, includeAnswerKey: !!checked }))
-                  }
-                />
-                <label htmlFor="pdf-answers" className="text-sm">Включить ответы</label>
-              </div>
-            </div>
+            )}
             
             <Button onClick={handleGeneratePdf} className="whitespace-nowrap">
               <FileDown className="mr-2 h-4 w-4" />
@@ -199,6 +202,29 @@ const TestSolver: React.FC = () => {
           </div>
         </div>
       </div>
+      
+      {resultsMode && (
+        <Card className="mb-6 bg-slate-50">
+          <CardHeader>
+            <CardTitle>Результаты</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <p className="text-lg font-medium">
+                Вы ответили правильно на {score.correct} из {score.total} вопросов
+                ({Math.round((score.correct / score.total) * 100)}%)
+              </p>
+              <Progress 
+                value={(score.correct / score.total) * 100} 
+                className="h-2" 
+              />
+              <p className="text-sm text-muted-foreground">
+                Ниже вы можете увидеть все свои ответы, правильные ответы и пояснения к заданиям.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
       
       <div className="space-y-6">
         {taskDetails.map((task, index) => {
@@ -276,6 +302,7 @@ const TestSolver: React.FC = () => {
                     value={userAnswer?.answer || ''}
                     onChange={(e) => handleAnswerChange(task.id, e.target.value)}
                     className="resize-none"
+                    readOnly={resultsMode}
                   />
                 </div>
                 
@@ -293,20 +320,23 @@ const TestSolver: React.FC = () => {
                   </div>
                 )}
               </CardContent>
-              
-              <CardFooter>
-                <Button 
-                  onClick={() => checkAnswer(task.id)}
-                  variant={isAnswered ? "outline" : "default"}
-                  className="ml-auto"
-                >
-                  {isAnswered ? "Проверить снова" : "Проверить ответ"}
-                </Button>
-              </CardFooter>
             </Card>
           );
         })}
       </div>
+
+      {!resultsMode && (
+        <div className="mt-8 flex justify-center">
+          <Button 
+            size="lg" 
+            onClick={checkAllAnswers}
+            className="px-8"
+          >
+            <FileCheck className="mr-2 h-5 w-5" />
+            Проверить все ответы
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

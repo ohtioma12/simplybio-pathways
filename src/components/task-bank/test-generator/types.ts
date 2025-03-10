@@ -46,3 +46,14 @@ export interface ExtendedTask extends Task {
   correctAnswers?: string[];
   explanation?: string;
 }
+
+export interface TestResult {
+  testId: string;
+  userId?: string;
+  answers: UserAnswer[];
+  score: {
+    correct: number;
+    total: number;
+  };
+  completedAt: string;
+}

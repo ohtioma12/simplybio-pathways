@@ -1,22 +1,58 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TaskOption } from './types';
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { toast } from "sonner";
 
 interface TaskSelectionListProps {
   filteredTasks: TaskOption[];
   toggleTaskSelection: (id: number) => void;
+  allTasks: TaskOption[];
+  addTaskByCode: (taskCode: string) => void;
 }
 
 const TaskSelectionList: React.FC<TaskSelectionListProps> = ({
   filteredTasks,
   toggleTaskSelection,
+  allTasks,
+  addTaskByCode,
 }) => {
+  const [taskCode, setTaskCode] = useState('');
+
+  const handleAddTaskByCode = () => {
+    if (!taskCode.trim()) {
+      toast.error('Введите код задания');
+      return;
+    }
+    
+    addTaskByCode(taskCode);
+    setTaskCode('');
+  };
+
   return (
     <div>
+      <div className="mb-4">
+        <label className="text-sm font-medium">Добавить задание по коду</label>
+        <div className="flex gap-2 mt-1">
+          <Input
+            value={taskCode}
+            onChange={(e) => setTaskCode(e.target.value)}
+            placeholder="Введите код задания (например, 01-001)"
+            className="flex-1"
+          />
+          <Button onClick={handleAddTaskByCode} size="sm">
+            <Plus className="h-4 w-4 mr-1" />
+            Добавить
+          </Button>
+        </div>
+      </div>
+
       <label className="text-sm font-medium">Доступные задания</label>
-      <ScrollArea className="h-[40vh] border rounded-md p-2 mt-1">
+      <ScrollArea className="h-[34vh] border rounded-md p-2 mt-1">
         <div className="space-y-2">
           {filteredTasks.map((task) => (
             <div key={task.id} className="flex items-start space-x-2 p-2 hover:bg-gray-50 rounded">

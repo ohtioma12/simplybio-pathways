@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Download, Edit } from 'lucide-react';
+import { Download, Edit, FileDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -22,6 +22,7 @@ export interface Material {
   size: string;
   icon: () => JSX.Element;
   tags: string[];
+  url?: string;
 }
 
 interface ResourcesMaterialsProps {
@@ -90,9 +91,22 @@ const ResourcesMaterials: React.FC<ResourcesMaterialsProps> = ({ materials: init
                 <p className="text-xs text-muted-foreground">Размер: {material.size}</p>
               </CardContent>
               <CardFooter>
-                <Button variant="outline" className="w-full">
-                  <Download className="h-4 w-4 mr-2" />
-                  Скачать материал
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  asChild={!!material.url}
+                >
+                  {material.url ? (
+                    <a href={material.url} target="_blank" rel="noopener noreferrer">
+                      <FileDown className="h-4 w-4 mr-2" />
+                      Скачать материал
+                    </a>
+                  ) : (
+                    <>
+                      <Download className="h-4 w-4 mr-2" />
+                      Скачать материал
+                    </>
+                  )}
                 </Button>
               </CardFooter>
             </Card>

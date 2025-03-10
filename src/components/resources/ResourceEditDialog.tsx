@@ -149,12 +149,13 @@ const ResourceEditDialog: React.FC<ResourceEditDialogProps> = ({
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="size">Размер</Label>
+                  <Label htmlFor="url">URL материала</Label>
                   <Input
-                    id="size"
-                    name="size"
-                    value={formData.size}
+                    id="url"
+                    name="url"
+                    value={formData.url || ''}
                     onChange={handleChange}
+                    placeholder="https://example.com/material.pdf"
                     required
                   />
                 </div>

@@ -17,6 +17,8 @@ import { generateTestPdf, saveTestOnline } from './test-generator/pdfGenerator';
 import { useAuth } from '@/components/auth/AuthContext';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { ExternalLink } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 const TestGeneratorDialog: React.FC<TestGeneratorDialogProps> = ({ tasks }) => {
   const navigate = useNavigate();
@@ -25,6 +27,8 @@ const TestGeneratorDialog: React.FC<TestGeneratorDialogProps> = ({ tasks }) => {
     includeExplanations: false,
     includeAnswerKey: false
   });
+  const [testId, setTestId] = useState<string | null>(null);
+  const [testUrl, setTestUrl] = useState<string>('');
 
   const {
     testName,
@@ -38,6 +42,7 @@ const TestGeneratorDialog: React.FC<TestGeneratorDialogProps> = ({ tasks }) => {
     uniqueLines,
     toggleTaskSelection,
     selectRandomTasks,
+    addTaskByCode,
     selectedTasksCount
   } = useTestGenerator(tasks);
 
@@ -50,13 +55,17 @@ const TestGeneratorDialog: React.FC<TestGeneratorDialogProps> = ({ tasks }) => {
     }
     
     // Save the test online
-    const testId = saveTestOnline(testName, selectedTasks, user?.id);
+    const newTestId = saveTestOnline(testName, selectedTasks, user?.id);
     
-    if (testId) {
+    if (newTestId) {
+      setTestId(newTestId);
+      const url = `${window.location.origin}/test-solver/${newTestId}`;
+      setTestUrl(url);
+      
       toast.success('Вариант создан успешно!', {
         action: {
           label: 'Решать',
-          onClick: () => navigate(`/test-solver/${testId}`)
+          onClick: () => navigate(`/test-solver/${newTestId}`)
         }
       });
     }
@@ -65,6 +74,13 @@ const TestGeneratorDialog: React.FC<TestGeneratorDialogProps> = ({ tasks }) => {
   const handleGeneratePDF = () => {
     const selectedTasks = taskOptions.filter(task => task.selected);
     generateTestPdf(testName, selectedTasks, pdfOptions, tasks);
+  };
+
+  const copyTestLink = () => {
+    if (testUrl) {
+      navigator.clipboard.writeText(testUrl);
+      toast.success('Ссылка скопирована в буфер обмена');
+    }
   };
 
   return (
@@ -93,8 +109,31 @@ const TestGeneratorDialog: React.FC<TestGeneratorDialogProps> = ({ tasks }) => {
         <TaskSelectionList
           filteredTasks={filteredTasks}
           toggleTaskSelection={toggleTaskSelection}
+          allTasks={taskOptions}
+          addTaskByCode={addTaskByCode}
         />
       </div>
+      
+      {testId && (
+        <div className="mt-4 p-4 bg-blue-50 rounded-md">
+          <h3 className="text-sm font-medium mb-2">Вариант создан! Отправьте ссылку ученикам:</h3>
+          <div className="flex gap-2">
+            <Input value={testUrl} readOnly className="bg-white" />
+            <Button onClick={copyTestLink} size="sm">Копировать</Button>
+          </div>
+          <div className="mt-2 flex justify-end">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => navigate(`/test-solver/${testId}`)}
+              className="flex items-center gap-1"
+            >
+              <ExternalLink className="h-4 w-4" />
+              Открыть вариант
+            </Button>
+          </div>
+        </div>
+      )}
       
       <div className="mt-4 space-y-2">
         <div className="flex items-center space-x-2">

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Task } from '../TaskCard';
 import { TaskOption } from './types';
+import { toast } from 'sonner';
 
 export const useTestGenerator = (tasks: Task[]) => {
   const [testName, setTestName] = useState('Тренировочный вариант 1');
@@ -50,6 +51,29 @@ export const useTestGenerator = (tasks: Task[]) => {
         option.id === id ? { ...option, selected: !option.selected } : option
       )
     );
+  };
+
+  const addTaskByCode = (code: string) => {
+    const normalizedCode = code.trim();
+    const task = taskOptions.find(t => t.taskCode === normalizedCode);
+    
+    if (!task) {
+      toast.error(`Задание с кодом ${normalizedCode} не найдено`);
+      return;
+    }
+    
+    if (task.selected) {
+      toast.info(`Задание с кодом ${normalizedCode} уже добавлено в вариант`);
+      return;
+    }
+    
+    setTaskOptions(prevOptions => 
+      prevOptions.map(option => 
+        option.id === task.id ? { ...option, selected: true } : option
+      )
+    );
+    
+    toast.success(`Задание с кодом ${normalizedCode} добавлено в вариант`);
   };
 
   const selectRandomTasks = () => {
@@ -117,6 +141,7 @@ export const useTestGenerator = (tasks: Task[]) => {
     uniqueLines,
     toggleTaskSelection,
     selectRandomTasks,
+    addTaskByCode,
     selectedTasksCount: taskOptions.filter(task => task.selected).length
   };
 };
