@@ -1,8 +1,7 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
-export type UserRole = 'user' | 'admin';
+export type UserRole = 'user' | 'admin' | 'teacher' | 'student';
 
 export interface User {
   id: string;
@@ -17,8 +16,10 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  register: (email: string, password: string, name: string) => Promise<void>;
+  register: (email: string, password: string, name: string, role?: UserRole) => Promise<void>;
   isAdmin: boolean;
+  isTeacher: boolean;
+  isStudent: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -45,6 +46,20 @@ const MOCK_USERS = [
     password: 'Odissey13',
     name: 'Odissey',
     role: 'admin' as UserRole,
+  },
+  {
+    id: '4',
+    email: 'teacher@prosto.ru',
+    password: 'teacher123',
+    name: 'Teacher User',
+    role: 'teacher' as UserRole,
+  },
+  {
+    id: '5',
+    email: 'student@prosto.ru',
+    password: 'student123',
+    name: 'Student User',
+    role: 'student' as UserRole,
   },
 ];
 
@@ -88,7 +103,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const register = async (email: string, password: string, name: string) => {
+  const register = async (email: string, password: string, name: string, role: UserRole = 'student') => {
     setIsLoading(true);
     
     try {
@@ -126,6 +141,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         logout,
         register,
         isAdmin: user?.role === 'admin',
+        isTeacher: user?.role === 'teacher',
+        isStudent: user?.role === 'student',
       }}
     >
       {children}

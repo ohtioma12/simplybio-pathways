@@ -6,6 +6,7 @@ import CtaSection from '@/components/task-bank/CtaSection';
 import { sampleTasks } from '@/components/task-bank/data';
 import { useTaskManagement } from '@/hooks/use-task-management';
 import { useTaskFilters } from '@/hooks/use-task-filters';
+import MyTestsButton from '@/components/task-bank/MyTestsButton';
 
 const TaskBank = () => {
   // Initialize task management
@@ -44,6 +45,10 @@ const TaskBank = () => {
       <HeroSection />
 
       {/* Task Bank Section */}
+      <div className="container mx-auto px-4 mb-4 flex justify-end gap-2">
+        <MyTestsButton />
+      </div>
+      
       <TaskBankLayout
         tasks={tasks}
         filteredTasks={filteredTasks}
