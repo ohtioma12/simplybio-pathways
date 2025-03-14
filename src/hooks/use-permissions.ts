@@ -2,7 +2,7 @@
 import { useAuth } from '@/components/auth/AuthContext';
 
 export const usePermissions = () => {
-  const { user, isAuthenticated, isAdmin, isTeacher, isStudent } = useAuth();
+  const { user, isAuthenticated, isAdmin, isTeacher, isStudent, isTelegramVerified } = useAuth();
 
   return {
     // General auth status
@@ -14,15 +14,18 @@ export const usePermissions = () => {
     isStudent,
     isUser: isAuthenticated && !isAdmin && !isTeacher && !isStudent,
     
+    // Telegram verification
+    isTelegramVerified,
+    
     // Task-specific permissions
     canViewTasks: isAuthenticated,
-    canSolveTasks: isAuthenticated,
+    canSolveTasks: isAuthenticated && isTelegramVerified,
     canCreateTasks: isAdmin || isTeacher,
     canEditTasks: isAdmin || isTeacher,
     canDeleteTasks: isAdmin,
     
     // Test management permissions
-    canCreateTests: isAuthenticated,
+    canCreateTests: isAuthenticated && isTelegramVerified,
     canViewAllTests: isAdmin || isTeacher,
     canEditResources: isAdmin,
     

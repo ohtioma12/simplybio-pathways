@@ -7,6 +7,7 @@ import { sampleTasks } from '@/components/task-bank/data';
 import { useTaskManagement } from '@/hooks/use-task-management';
 import { useTaskFilters } from '@/hooks/use-task-filters';
 import MyTestsButton from '@/components/task-bank/MyTestsButton';
+import { usePermissions } from '@/hooks/use-permissions';
 
 const TaskBank = () => {
   // Initialize task management
@@ -38,6 +39,7 @@ const TaskBank = () => {
 
   // Get filtered tasks
   const filteredTasks = getFilteredTasks(tasks);
+  const { isAuthenticated } = usePermissions();
 
   return (
     <>
@@ -45,9 +47,11 @@ const TaskBank = () => {
       <HeroSection />
 
       {/* Task Bank Section */}
-      <div className="container mx-auto px-4 mb-6 flex justify-end">
-        <MyTestsButton />
-      </div>
+      {isAuthenticated && (
+        <div className="container mx-auto px-4 my-6 flex justify-end">
+          <MyTestsButton />
+        </div>
+      )}
       
       <TaskBankLayout
         tasks={tasks}

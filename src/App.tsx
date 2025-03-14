@@ -13,6 +13,7 @@ import Reviews from "./pages/Reviews";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import TestSolver from "./pages/TestSolver";
+import Profile from "./pages/Profile";
 import { AuthProvider } from "./components/auth/AuthContext";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
                 <Route path="/reviews" element={<Reviews />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/test-solver/:testId" element={<TestSolver />} />
+                <Route path="/profile" element={<Profile />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

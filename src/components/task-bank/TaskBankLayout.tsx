@@ -1,11 +1,12 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import TaskList from './TaskList';
 import TaskFilters from './TaskFilters';
 import UploadTaskButton from './UploadTaskButton';
 import GenerateTestButton from './GenerateTestButton';
 import { Task } from './TaskCard';
 import { usePermissions } from '@/hooks/use-permissions';
+import TelegramVerificationDialog from './TelegramVerificationDialog';
 
 interface TaskBankLayoutProps {
   tasks: Task[];
@@ -50,7 +51,15 @@ const TaskBankLayout: React.FC<TaskBankLayoutProps> = ({
   onTaskDelete,
   onTaskAdd
 }) => {
-  const { canCreateTasks, isAuthenticated } = usePermissions();
+  const { canCreateTasks, isAuthenticated, isTelegramVerified, canSolveTasks } = usePermissions();
+  const [showTelegramDialog, setShowTelegramDialog] = useState(false);
+
+  // Show telegram verification dialog if user is authenticated but not verified
+  React.useEffect(() => {
+    if (isAuthenticated && !isTelegramVerified) {
+      setShowTelegramDialog(true);
+    }
+  }, [isAuthenticated, isTelegramVerified]);
 
   return (
     <section className="py-12 bg-slate-50">
@@ -89,11 +98,26 @@ const TaskBankLayout: React.FC<TaskBankLayoutProps> = ({
             </div>
 
             {isAuthenticated ? (
-              <TaskList 
-                tasks={filteredTasks} 
-                onTaskUpdate={onTaskUpdate} 
-                onTaskDelete={onTaskDelete}
-              />
+              canSolveTasks ? (
+                <TaskList 
+                  tasks={filteredTasks} 
+                  onTaskUpdate={onTaskUpdate} 
+                  onTaskDelete={onTaskDelete}
+                />
+              ) : (
+                <div className="p-8 bg-white rounded-lg shadow-md text-center">
+                  <h3 className="text-xl font-semibold mb-4">Telegram подписка</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Для просмотра и выполнения заданий необходимо подписаться на наш Telegram канал.
+                  </p>
+                  <Button 
+                    variant="default" 
+                    onClick={() => setShowTelegramDialog(true)}
+                  >
+                    Подписаться на канал
+                  </Button>
+                </div>
+              )
             ) : (
               <div className="p-8 bg-white rounded-lg shadow-md text-center">
                 <h3 className="text-xl font-semibold mb-4">Доступ ограничен</h3>
@@ -108,8 +132,17 @@ const TaskBankLayout: React.FC<TaskBankLayoutProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Telegram Verification Dialog */}
+      <TelegramVerificationDialog 
+        isOpen={showTelegramDialog} 
+        onClose={() => setShowTelegramDialog(false)} 
+      />
     </section>
   );
 };
+
+// Add Button import
+import { Button } from '@/components/ui/button';
 
 export default TaskBankLayout;

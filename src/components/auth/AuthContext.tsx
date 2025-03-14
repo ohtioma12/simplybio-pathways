@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
@@ -20,6 +21,7 @@ interface AuthContextType {
   isAdmin: boolean;
   isTeacher: boolean;
   isStudent: boolean;
+  isTelegramVerified: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -131,6 +133,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     toast.info('Вы вышли из системы');
   };
 
+  const isTelegramVerified = localStorage.getItem('telegramSubscribed') === 'true';
+
   return (
     <AuthContext.Provider
       value={{
@@ -143,6 +147,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAdmin: user?.role === 'admin',
         isTeacher: user?.role === 'teacher',
         isStudent: user?.role === 'student',
+        isTelegramVerified,
       }}
     >
       {children}

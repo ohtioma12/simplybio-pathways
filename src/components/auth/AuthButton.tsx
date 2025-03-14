@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { LogIn, LogOut, User } from 'lucide-react';
+import { LogIn, LogOut, User, UserCircle } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import LoginDialog from './LoginDialog';
 import RegisterDialog from './RegisterDialog';
+import { Link } from 'react-router-dom';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const AuthButton: React.FC = () => {
-  const { user, isAuthenticated, logout, isAdmin } = useAuth();
+  const { user, isAuthenticated, logout, isAdmin, isTeacher, isStudent } = useAuth();
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [showRegisterDialog, setShowRegisterDialog] = useState(false);
 
@@ -36,6 +37,13 @@ const AuthButton: React.FC = () => {
     setShowRegisterDialog(false);
   };
 
+  const getUserRoleName = () => {
+    if (isAdmin) return 'Администратор';
+    if (isTeacher) return 'Преподаватель';
+    if (isStudent) return 'Студент';
+    return 'Пользователь';
+  };
+
   if (isAuthenticated && user) {
     return (
       <>
@@ -52,10 +60,17 @@ const AuthButton: React.FC = () => {
                 <span>{user.name}</span>
                 <span className="text-xs text-muted-foreground">{user.email}</span>
                 <span className="text-xs font-medium mt-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary inline-block w-fit">
-                  {isAdmin ? 'Администратор' : 'Пользователь'}
+                  {getUserRoleName()}
                 </span>
               </div>
             </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link to="/profile" className="flex items-center cursor-pointer">
+                <UserCircle className="h-4 w-4 mr-2" />
+                Личный кабинет
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={logout} className="text-destructive">
               <LogOut className="h-4 w-4 mr-2" />

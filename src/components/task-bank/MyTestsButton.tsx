@@ -12,7 +12,8 @@ import {
 } from '@/components/ui/dialog';
 import { useAuth } from '@/components/auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { getUserTests, deleteTest } from './test-generator/pdfGenerator';
+import { getUserTests, deleteTest, generateTestPdf } from './test-generator/pdfGenerator';
+import { sampleTasks } from './data';
 import { toast } from 'sonner';
 import { 
   Table, 
@@ -32,6 +33,7 @@ import {
   DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const MyTestsButton: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
@@ -40,6 +42,10 @@ const MyTestsButton: React.FC = () => {
   const [userTests, setUserTests] = useState([]);
   const [selectedTest, setSelectedTest] = useState<any>(null);
   const [showShareDialog, setShowShareDialog] = useState(false);
+  const [pdfOptions, setPdfOptions] = useState({
+    includeExplanations: false,
+    includeAnswerKey: true
+  });
   
   const loadTests = () => {
     if (!isAuthenticated) return;
@@ -77,6 +83,24 @@ const MyTestsButton: React.FC = () => {
     toast.success('Ссылка скопирована в буфер обмена');
   };
   
+  const handleDownloadPdf = (test: any) => {
+    // Create taskOptions for the generateTestPdf function
+    const taskOptions = test.tasks.map((taskId: number) => {
+      const taskDetails = sampleTasks.find(t => t.id === taskId);
+      if (!taskDetails) return null;
+      
+      return {
+        id: taskDetails.id,
+        title: taskDetails.title,
+        taskCode: taskDetails.taskCode || `Task-${taskDetails.id}`,
+        line: taskDetails.line || 'N/A',
+        selected: true
+      };
+    }).filter(Boolean);
+    
+    generateTestPdf(test.name, taskOptions, pdfOptions, sampleTasks);
+  };
+  
   if (!isAuthenticated) {
     return null;
   }
@@ -97,6 +121,40 @@ const MyTestsButton: React.FC = () => {
               Здесь собраны все созданные вами варианты заданий
             </DialogDescription>
           </DialogHeader>
+          
+          <div className="space-y-2 mb-4">
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="include-explanations"
+                checked={pdfOptions.includeExplanations}
+                onCheckedChange={(checked) => 
+                  setPdfOptions(prev => ({ ...prev, includeExplanations: !!checked }))
+                }
+              />
+              <label 
+                htmlFor="include-explanations" 
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Добавить пояснения к заданиям в PDF
+              </label>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="include-answer-key"
+                checked={pdfOptions.includeAnswerKey}
+                onCheckedChange={(checked) => 
+                  setPdfOptions(prev => ({ ...prev, includeAnswerKey: !!checked }))
+                }
+              />
+              <label 
+                htmlFor="include-answer-key" 
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Добавить ключи с ответами в PDF
+              </label>
+            </div>
+          </div>
           
           {userTests.length > 0 ? (
             <div className="overflow-y-auto max-h-[60vh]">
@@ -133,7 +191,7 @@ const MyTestsButton: React.FC = () => {
                               <Copy className="mr-2 h-4 w-4" />
                               Копировать ссылку
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDownloadPdf(test)}>
                               <Download className="mr-2 h-4 w-4" />
                               Скачать PDF
                             </DropdownMenuItem>
