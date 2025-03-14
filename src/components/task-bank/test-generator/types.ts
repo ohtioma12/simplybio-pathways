@@ -30,10 +30,18 @@ export interface TestSolverPageProps {
   testId: string;
 }
 
+// Modified UserAnswer to be compatible with statistics-service
 export interface UserAnswer {
   taskId: number;
   answer: string;
   isCorrect?: boolean;
+  // Adding the following fields to make it compatible with the statistics-service version
+  taskCode?: string;
+  taskTitle?: string;
+  userAnswer?: string;
+  correctAnswer?: string;
+  points?: number;
+  maxPoints?: number;
 }
 
 export interface TestGenerationOptions {

@@ -79,7 +79,7 @@ const MyTestsButton: React.FC = () => {
       
       // Use a type assertion to tell TypeScript that we're handling the case where taskCode might not exist
       const generatedTaskCode = (taskDetails as any).taskCode || 
-        `${lineNumber.toString().padStart(2, '0')}-${(task.id % 1000).toString().padStart(3, '0')}`;
+        `${lineNumber.toString().padStart(2, '0')}-${(taskId % 1000).toString().padStart(3, '0')}`;
       
       return {
         id: taskDetails.id,

@@ -17,7 +17,7 @@ import {
   TableCell
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { UserAnswer } from '@/components/task-bank/user-statistics/statistics-service';
+import { UserAnswer } from '@/components/task-bank/test-generator/types';
 import { TaskOption } from '@/components/task-bank/test-generator/types';
 import { Check, X } from 'lucide-react';
 import { Task } from '@/components/task-bank/TaskCard';
@@ -76,16 +76,18 @@ const TestResultsDetailed: React.FC<TestResultsDetailedProps> = ({
                 const maxPoints = (task as any)?.points || 1;
                 const earnedPoints = answer.isCorrect ? maxPoints : 0;
                 
+                const userAnswerText = answer.userAnswer || answer.answer || '-';
+                
                 return (
                   <TableRow key={answer.taskId}>
                     <TableCell className="font-medium">{index + 1}</TableCell>
                     <TableCell>{taskOption?.taskCode || `Задание ${answer.taskId}`}</TableCell>
                     <TableCell>
                       <span className={answer.isCorrect ? 'text-green-600' : 'text-red-600'}>
-                        {answer.userAnswer || '-'}
+                        {userAnswerText}
                       </span>
                     </TableCell>
-                    <TableCell>{correctAnswers.join(' или ')}</TableCell>
+                    <TableCell>{answer.correctAnswer || correctAnswers.join(' или ')}</TableCell>
                     <TableCell className="text-center">
                       {answer.isCorrect ? (
                         <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">

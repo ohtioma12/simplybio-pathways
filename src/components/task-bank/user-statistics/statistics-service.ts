@@ -1,6 +1,8 @@
 
 import { sampleTasks } from '../data';
+import { UserAnswer as TypesUserAnswer } from '../test-generator/types';
 
+// Extended the UserAnswer interface to be compatible with both use cases
 export interface UserAnswer {
   taskId: number;
   taskCode?: string;
@@ -10,6 +12,8 @@ export interface UserAnswer {
   isCorrect: boolean;
   points?: number;
   maxPoints?: number;
+  // Adding this property to make it compatible with the types.ts version
+  answer?: string;
 }
 
 export interface SolvedTest {
@@ -23,10 +27,25 @@ export interface SolvedTest {
   };
 }
 
+// Helper function to convert between UserAnswer formats
+export const convertUserAnswer = (answer: TypesUserAnswer): UserAnswer => {
+  return {
+    taskId: answer.taskId,
+    taskCode: answer.taskCode,
+    taskTitle: answer.taskTitle,
+    userAnswer: answer.answer || '',
+    correctAnswer: answer.correctAnswer || '',
+    isCorrect: answer.isCorrect || false,
+    points: answer.points,
+    maxPoints: answer.maxPoints,
+    answer: answer.answer
+  };
+};
+
 export const saveTestResults = (
   testId: string,
   testName: string,
-  answers: UserAnswer[],
+  answers: any[],
   userId?: string
 ): void => {
   try {
@@ -36,12 +55,23 @@ export const saveTestResults = (
       total: answers.length
     };
 
+    // Convert answers to the standard format if needed
+    const standardizedAnswers = answers.map(answer => {
+      if (answer.answer && !answer.userAnswer) {
+        return {
+          ...answer,
+          userAnswer: answer.answer
+        };
+      }
+      return answer;
+    });
+
     // Create solved test record
     const solvedTest: SolvedTest = {
       testId,
       testName,
       completedAt: new Date().toISOString(),
-      answers,
+      answers: standardizedAnswers,
       score
     };
 

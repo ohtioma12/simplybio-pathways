@@ -10,7 +10,10 @@ import {
 import { sampleTasks } from '@/components/task-bank/data';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { saveTestResults } from '@/components/task-bank/user-statistics/statistics-service';
+import { 
+  saveTestResults, 
+  convertUserAnswer 
+} from '@/components/task-bank/user-statistics/statistics-service';
 import { useAuth } from '@/components/auth/AuthContext';
 
 export const useTestSolver = (testId: string | undefined) => {
@@ -103,19 +106,21 @@ export const useTestSolver = (testId: string | undefined) => {
       
       if (isCorrect) correctCount++;
       
-      // Format for statistics
-      return { 
+      // Create a properly typed answer object
+      return {
         taskId: userAnswer.taskId,
+        answer: userAnswer.answer,
+        isCorrect,
         taskCode: taskOption?.taskCode,
         taskTitle: task.title,
         userAnswer: userAnswer.answer,
         correctAnswer: correctAnswersArray.join(' или '),
-        isCorrect,
         points: isCorrect ? ((task as any).points || 1) : 0,
         maxPoints: (task as any).points || 1 
-      };
+      } as UserAnswer;
     });
     
+    // Update user answers with the checked results
     setUserAnswers(checkedAnswers);
     
     const currentScore = {
