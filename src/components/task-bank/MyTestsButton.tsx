@@ -89,10 +89,15 @@ const MyTestsButton: React.FC = () => {
       const taskDetails = sampleTasks.find(t => t.id === taskId);
       if (!taskDetails) return null;
       
+      // Generate taskCode if it doesn't exist
+      const lineNumber = parseInt(taskDetails.line.replace('Линия ', ''), 10) || 0;
+      const generatedTaskCode = taskDetails.taskCode || 
+        `${lineNumber.toString().padStart(2, '0')}-${(taskDetails.id % 1000).toString().padStart(3, '0')}`;
+      
       return {
         id: taskDetails.id,
         title: taskDetails.title,
-        taskCode: taskDetails.taskCode || `Task-${taskDetails.id}`,
+        taskCode: generatedTaskCode,
         line: taskDetails.line || 'N/A',
         selected: true
       };
