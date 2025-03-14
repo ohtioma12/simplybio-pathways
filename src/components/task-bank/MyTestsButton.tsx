@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { FileText, Link, Trash, ExternalLink, Download, Copy, BarChart } from 'lucide-react';
+import { FileText, BarChart } from 'lucide-react';
 import { 
   Dialog, 
   DialogContent, 
@@ -11,34 +11,17 @@ import {
   DialogTrigger
 } from '@/components/ui/dialog';
 import { useAuth } from '@/components/auth/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import { getUserTests, deleteTest, generateTestPdf } from './test-generator/pdfGenerator';
 import { sampleTasks } from './data';
 import { toast } from 'sonner';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { format } from 'date-fns';
-import { ru } from 'date-fns/locale';
-import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import UserStatistics from './user-statistics/UserStatistics';
+
+// Import our new components
+import PdfOptionsSection from './my-tests/PdfOptionsSection';
+import TestsTable from './my-tests/TestsTable';
+import ShareTestDialog from './my-tests/ShareTestDialog';
 
 const MyTestsButton: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [userTests, setUserTests] = useState([]);
   const [selectedTest, setSelectedTest] = useState<any>(null);
@@ -96,7 +79,7 @@ const MyTestsButton: React.FC = () => {
       
       // Use a type assertion to tell TypeScript that we're handling the case where taskCode might not exist
       const generatedTaskCode = (taskDetails as any).taskCode || 
-        `${lineNumber.toString().padStart(2, '0')}-${(taskDetails.id % 1000).toString().padStart(3, '0')}`;
+        `${lineNumber.toString().padStart(2, '0')}-${(task.id % 1000).toString().padStart(3, '0')}`;
       
       return {
         id: taskDetails.id,
@@ -119,7 +102,7 @@ const MyTestsButton: React.FC = () => {
   if (!isAuthenticated) {
     return null;
   }
-  
+
   return (
     <>
       <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -138,39 +121,10 @@ const MyTestsButton: React.FC = () => {
           </DialogHeader>
           
           <div className="space-y-2 mb-4 flex justify-between items-center">
-            <div>
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="include-explanations"
-                  checked={pdfOptions.includeExplanations}
-                  onCheckedChange={(checked) => 
-                    setPdfOptions(prev => ({ ...prev, includeExplanations: !!checked }))
-                  }
-                />
-                <label 
-                  htmlFor="include-explanations" 
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Добавить пояснения к заданиям в PDF
-                </label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="include-answer-key"
-                  checked={pdfOptions.includeAnswerKey}
-                  onCheckedChange={(checked) => 
-                    setPdfOptions(prev => ({ ...prev, includeAnswerKey: !!checked }))
-                  }
-                />
-                <label 
-                  htmlFor="include-answer-key" 
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Добавить ключи с ответами в PDF
-                </label>
-              </div>
-            </div>
+            <PdfOptionsSection 
+              pdfOptions={pdfOptions} 
+              setPdfOptions={setPdfOptions} 
+            />
             
             <Button 
               variant="outline" 
@@ -182,135 +136,45 @@ const MyTestsButton: React.FC = () => {
             </Button>
           </div>
           
-          {userTests.length > 0 ? (
-            <div className="overflow-y-auto max-h-[60vh]">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Название</TableHead>
-                    <TableHead>Дата создания</TableHead>
-                    <TableHead>Кол-во заданий</TableHead>
-                    <TableHead className="text-right">Действия</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {userTests.map((test: any) => (
-                    <TableRow key={test.id}>
-                      <TableCell className="font-medium">{test.name}</TableCell>
-                      <TableCell>
-                        {format(new Date(test.createdAt), 'dd MMM yyyy, HH:mm', { locale: ru })}
-                      </TableCell>
-                      <TableCell>{test.tasks.length}</TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <Link className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => navigate(`/test-solver/${test.id}`)}>
-                              <ExternalLink className="mr-2 h-4 w-4" />
-                              Открыть вариант
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => copyTestLink(test.id)}>
-                              <Copy className="mr-2 h-4 w-4" />
-                              Копировать ссылку
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleDownloadPdf(test)}>
-                              <Download className="mr-2 h-4 w-4" />
-                              Скачать PDF
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem 
-                              onClick={() => handleDeleteTest(test.id)}
-                              className="text-destructive"
-                            >
-                              <Trash className="mr-2 h-4 w-4" />
-                              Удалить
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground mb-4">У вас пока нет созданных вариантов</p>
-              <Button onClick={() => setOpen(false)}>Создать первый вариант</Button>
-            </div>
-          )}
+          <TestsTable 
+            tests={userTests}
+            onDelete={handleDeleteTest}
+            onDownloadPdf={handleDownloadPdf}
+            onShare={handleShareTest}
+            getTestUrl={getTestUrl}
+            copyTestLink={copyTestLink}
+          />
         </DialogContent>
       </Dialog>
 
-      {showShareDialog && selectedTest && (
-        <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
-          <DialogContent className="max-w-md">
+      {/* Share Test Dialog */}
+      <ShareTestDialog 
+        isOpen={showShareDialog}
+        onOpenChange={setShowShareDialog}
+        selectedTest={selectedTest}
+        getTestUrl={getTestUrl}
+        copyTestLink={copyTestLink}
+      />
+
+      {/* Statistics Dialog */}
+      {showStatisticsDialog && (
+        <Dialog open={showStatisticsDialog} onOpenChange={setShowStatisticsDialog}>
+          <DialogContent className="max-w-4xl max-h-[90vh]">
             <DialogHeader>
-              <DialogTitle>Поделиться вариантом</DialogTitle>
+              <DialogTitle>Моя статистика</DialogTitle>
               <DialogDescription>
-                Отправьте эту ссылку ученикам для прохождения варианта
+                Ваши результаты по решенным вариантам и заданиям
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm font-medium mb-2">Вариант: {selectedTest.name}</p>
-                <div className="flex gap-2">
-                  <Input 
-                    value={getTestUrl(selectedTest.id)} 
-                    readOnly 
-                    className="flex-1"
-                  />
-                  <Button 
-                    onClick={() => copyTestLink(selectedTest.id)} 
-                    size="sm"
-                  >
-                    <Copy className="h-4 w-4 mr-1" />
-                    Копировать
-                  </Button>
-                </div>
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => setShowShareDialog(false)}
-                >
-                  Закрыть
-                </Button>
-                <Button 
-                  size="sm" 
-                  onClick={() => {
-                    navigate(`/test-solver/${selectedTest.id}`);
-                    setShowShareDialog(false);
-                  }}
-                >
-                  <ExternalLink className="h-4 w-4 mr-1" />
-                  Открыть вариант
-                </Button>
-              </div>
-            </div>
+            <UserStatistics userId={user?.id} />
           </DialogContent>
         </Dialog>
       )}
-
-      {/* Statistics Dialog */}
-      <Dialog open={showStatisticsDialog} onOpenChange={setShowStatisticsDialog}>
-        <DialogContent className="max-w-4xl max-h-[90vh]">
-          <DialogHeader>
-            <DialogTitle>Моя статистика</DialogTitle>
-            <DialogDescription>
-              Ваши результаты по решенным вариантам и заданиям
-            </DialogDescription>
-          </DialogHeader>
-          <UserStatistics userId={user?.id} />
-        </DialogContent>
-      </Dialog>
     </>
   );
 };
+
+// Import UserStatistics component
+import UserStatistics from './user-statistics/UserStatistics';
 
 export default MyTestsButton;
