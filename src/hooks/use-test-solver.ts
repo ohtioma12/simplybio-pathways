@@ -10,9 +10,12 @@ import {
 import { sampleTasks } from '@/components/task-bank/data';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { saveTestResults } from '@/components/task-bank/user-statistics/statistics-service';
+import { useAuth } from '@/components/auth/AuthContext';
 
 export const useTestSolver = (testId: string | undefined) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [test, setTest] = useState<SavedTest | null>(null);
   const [taskDetails, setTaskDetails] = useState<TaskOption[]>([]);
   const [userAnswers, setUserAnswers] = useState<UserAnswer[]>([]);
@@ -44,9 +47,13 @@ export const useTestSolver = (testId: string | undefined) => {
         const task = sampleTasks.find(t => t.id === id);
         if (!task) return null;
         
+        // Generate taskCode
+        const lineNumber = parseInt(task.line.replace('Линия ', ''), 10) || 0;
+        const taskCode = `${lineNumber.toString().padStart(2, '0')}-${task.id.toString().padStart(3, '0')}`;
+        
         return {
           id: task.id,
-          taskCode: `${task.line.replace('Линия ', '')}-${task.id.toString().padStart(3, '0')}`,
+          taskCode: taskCode,
           title: task.title,
           line: task.line,
           selected: true
@@ -81,6 +88,7 @@ export const useTestSolver = (testId: string | undefined) => {
     let correctCount = 0;
     const checkedAnswers = userAnswers.map(userAnswer => {
       const task = sampleTasks.find(t => t.id === userAnswer.taskId) as ExtendedTask | undefined;
+      const taskOption = taskDetails.find(t => t.id === userAnswer.taskId);
       
       if (!task) return userAnswer;
       
@@ -95,18 +103,45 @@ export const useTestSolver = (testId: string | undefined) => {
       
       if (isCorrect) correctCount++;
       
-      return { ...userAnswer, isCorrect };
+      // Format for statistics
+      return { 
+        taskId: userAnswer.taskId,
+        taskCode: taskOption?.taskCode,
+        taskTitle: task.title,
+        userAnswer: userAnswer.answer,
+        correctAnswer: correctAnswersArray.join(' или '),
+        isCorrect,
+        points: isCorrect ? ((task as any).points || 1) : 0,
+        maxPoints: (task as any).points || 1 
+      };
     });
     
     setUserAnswers(checkedAnswers);
-    setScore({
+    
+    const currentScore = {
       correct: correctCount,
       total: userAnswers.length
-    });
+    };
+    
+    setScore(currentScore);
     setResultsMode(true);
+    
+    // Save results to user statistics
+    if (test) {
+      saveTestResults(
+        test.id,
+        test.name,
+        checkedAnswers,
+        user?.id
+      );
+    }
     
     // Scroll to top to show results
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Show toast with result
+    const percentage = Math.round((correctCount / userAnswers.length) * 100);
+    toast.success(`Тест завершен! Ваш результат: ${correctCount} из ${userAnswers.length} (${percentage}%)`);
   };
   
   return {

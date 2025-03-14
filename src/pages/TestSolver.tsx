@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { generateTestPdf } from '@/components/task-bank/test-generator/pdfGenerator';
 import { ExtendedTask } from '@/components/task-bank/test-generator/types';
@@ -9,9 +9,13 @@ import TestHeader from '@/components/test-solver/TestHeader';
 import TestResults from '@/components/test-solver/TestResults';
 import TaskItem from '@/components/test-solver/TaskItem';
 import CheckAnswersButton from '@/components/test-solver/CheckAnswersButton';
+import TestResultsDetailed from '@/components/test-solver/TestResultsDetailed';
+import { Button } from '@/components/ui/button';
+import { Download } from 'lucide-react';
 
 const TestSolver: React.FC = () => {
   const { testId } = useParams<{ testId: string }>();
+  const [showDetailedResults, setShowDetailedResults] = useState(false);
   
   const {
     test,
@@ -57,7 +61,31 @@ const TestSolver: React.FC = () => {
         onGeneratePdf={handleGeneratePdf}
       />
       
-      {resultsMode && <TestResults score={score} />}
+      {resultsMode && (
+        <>
+          <TestResults score={score} />
+          
+          <div className="mb-6 flex justify-end">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowDetailedResults(true)}
+              className="flex items-center gap-2"
+            >
+              Подробные результаты
+            </Button>
+          </div>
+          
+          {showDetailedResults && (
+            <TestResultsDetailed
+              isOpen={showDetailedResults}
+              onClose={() => setShowDetailedResults(false)}
+              userAnswers={userAnswers}
+              taskDetails={taskDetails}
+              sampleTasks={sampleTasks}
+            />
+          )}
+        </>
+      )}
       
       <div className="space-y-6">
         {taskDetails.map((task, index) => {
@@ -84,6 +112,19 @@ const TestSolver: React.FC = () => {
         onCheckAnswers={checkAllAnswers} 
         show={!resultsMode} 
       />
+
+      {!resultsMode && (
+        <div className="mt-8 flex justify-end">
+          <Button
+            variant="outline"
+            onClick={handleGeneratePdf}
+            className="flex items-center gap-2"
+          >
+            <Download className="h-4 w-4" />
+            Скачать PDF
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

@@ -4,6 +4,7 @@ import TaskList from './TaskList';
 import TaskFilters from './TaskFilters';
 import UploadTaskButton from './UploadTaskButton';
 import GenerateTestButton from './GenerateTestButton';
+import MyTestsButton from './MyTestsButton';
 import { Task } from './TaskCard';
 import { usePermissions } from '@/hooks/use-permissions';
 import TelegramVerificationDialog from './TelegramVerificationDialog';
@@ -92,7 +93,8 @@ const TaskBankLayout: React.FC<TaskBankLayoutProps> = ({
                 Задания ({filteredTasks.length})
               </h2>
               <div className="flex gap-2 flex-wrap">
-                <GenerateTestButton tasks={tasks} />
+                {isAuthenticated && <GenerateTestButton tasks={tasks} />}
+                {isAuthenticated && <MyTestsButton />}
                 {canCreateTasks && <UploadTaskButton onTaskAdd={onTaskAdd} />}
               </div>
             </div>

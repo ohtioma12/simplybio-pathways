@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { FileText, Link, Trash, ExternalLink, Download, Copy } from 'lucide-react';
+import { FileText, Link, Trash, ExternalLink, Download, Copy, BarChart } from 'lucide-react';
 import { 
   Dialog, 
   DialogContent, 
@@ -34,6 +34,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import UserStatistics from './user-statistics/UserStatistics';
 
 const MyTestsButton: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
@@ -42,6 +43,7 @@ const MyTestsButton: React.FC = () => {
   const [userTests, setUserTests] = useState([]);
   const [selectedTest, setSelectedTest] = useState<any>(null);
   const [showShareDialog, setShowShareDialog] = useState(false);
+  const [showStatisticsDialog, setShowStatisticsDialog] = useState(false);
   const [pdfOptions, setPdfOptions] = useState({
     includeExplanations: false,
     includeAnswerKey: true
@@ -105,7 +107,13 @@ const MyTestsButton: React.FC = () => {
       };
     }).filter(Boolean);
     
-    generateTestPdf(test.name, taskOptions, pdfOptions, sampleTasks);
+    const success = generateTestPdf(test.name, taskOptions, pdfOptions, sampleTasks);
+    
+    if (success) {
+      toast.success('PDF успешно сгенерирован и скачан');
+    } else {
+      toast.error('Ошибка при генерации PDF');
+    }
   };
   
   if (!isAuthenticated) {
@@ -129,38 +137,49 @@ const MyTestsButton: React.FC = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="space-y-2 mb-4">
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="include-explanations"
-                checked={pdfOptions.includeExplanations}
-                onCheckedChange={(checked) => 
-                  setPdfOptions(prev => ({ ...prev, includeExplanations: !!checked }))
-                }
-              />
-              <label 
-                htmlFor="include-explanations" 
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Добавить пояснения к заданиям в PDF
-              </label>
+          <div className="space-y-2 mb-4 flex justify-between items-center">
+            <div>
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="include-explanations"
+                  checked={pdfOptions.includeExplanations}
+                  onCheckedChange={(checked) => 
+                    setPdfOptions(prev => ({ ...prev, includeExplanations: !!checked }))
+                  }
+                />
+                <label 
+                  htmlFor="include-explanations" 
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Добавить пояснения к заданиям в PDF
+                </label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="include-answer-key"
+                  checked={pdfOptions.includeAnswerKey}
+                  onCheckedChange={(checked) => 
+                    setPdfOptions(prev => ({ ...prev, includeAnswerKey: !!checked }))
+                  }
+                />
+                <label 
+                  htmlFor="include-answer-key" 
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Добавить ключи с ответами в PDF
+                </label>
+              </div>
             </div>
             
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="include-answer-key"
-                checked={pdfOptions.includeAnswerKey}
-                onCheckedChange={(checked) => 
-                  setPdfOptions(prev => ({ ...prev, includeAnswerKey: !!checked }))
-                }
-              />
-              <label 
-                htmlFor="include-answer-key" 
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Добавить ключи с ответами в PDF
-              </label>
-            </div>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowStatisticsDialog(true)}
+              className="flex gap-2 items-center"
+            >
+              <BarChart className="h-4 w-4" />
+              Моя статистика
+            </Button>
           </div>
           
           {userTests.length > 0 ? (
@@ -277,6 +296,19 @@ const MyTestsButton: React.FC = () => {
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Statistics Dialog */}
+      <Dialog open={showStatisticsDialog} onOpenChange={setShowStatisticsDialog}>
+        <DialogContent className="max-w-4xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>Моя статистика</DialogTitle>
+            <DialogDescription>
+              Ваши результаты по решенным вариантам и заданиям
+            </DialogDescription>
+          </DialogHeader>
+          <UserStatistics userId={user?.id} />
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
