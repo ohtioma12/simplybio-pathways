@@ -91,7 +91,9 @@ const MyTestsButton: React.FC = () => {
       
       // Generate taskCode if it doesn't exist
       const lineNumber = parseInt(taskDetails.line.replace('Линия ', ''), 10) || 0;
-      const generatedTaskCode = taskDetails.taskCode || 
+      
+      // Use a type assertion to tell TypeScript that we're handling the case where taskCode might not exist
+      const generatedTaskCode = (taskDetails as any).taskCode || 
         `${lineNumber.toString().padStart(2, '0')}-${(taskDetails.id % 1000).toString().padStart(3, '0')}`;
       
       return {
