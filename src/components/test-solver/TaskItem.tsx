@@ -9,18 +9,14 @@ import {
 } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { CheckCircle, XCircle } from 'lucide-react';
-import { ExtendedTask } from '@/components/task-bank/test-generator/types';
+import { ExtendedTask, UserAnswer } from '@/components/task-bank/test-generator/types';
 import { TaskOption } from '@/components/task-bank/test-generator/types';
 
 interface TaskItemProps {
   task: TaskOption;
   fullTask: ExtendedTask;
   index: number;
-  userAnswer: {
-    taskId: number;
-    answer: string;
-    isCorrect?: boolean;
-  } | undefined;
+  userAnswer: UserAnswer | undefined;
   resultsMode: boolean;
   onAnswerChange: (taskId: number, value: string) => void;
 }

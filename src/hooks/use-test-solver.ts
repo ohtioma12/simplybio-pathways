@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { 
   SavedTest, 
@@ -63,7 +64,11 @@ export const useTestSolver = (testId: string | undefined) => {
       
       setTaskDetails(tasksDetails);
       
-      setUserAnswers(taskIds.map(id => ({ taskId: id, answer: '' })));
+      // Initialize userAnswers with an empty string for 'answer'
+      setUserAnswers(taskIds.map(id => ({ 
+        taskId: id, 
+        answer: '' // Ensure answer is always a string, not undefined
+      })));
       
     } catch (error) {
       console.error('Error loading test:', error);
@@ -102,9 +107,10 @@ export const useTestSolver = (testId: string | undefined) => {
       
       if (isCorrect) correctCount++;
       
+      // Ensure we return an object that satisfies the UserAnswer interface
       return {
         taskId: userAnswer.taskId,
-        answer: userAnswer.answer,
+        answer: userAnswer.answer, // Make sure this is always present
         isCorrect,
         taskCode: taskOption?.taskCode,
         taskTitle: task.title,
@@ -115,7 +121,7 @@ export const useTestSolver = (testId: string | undefined) => {
       } as UserAnswer;
     });
     
-    setUserAnswers(checkedAnswers);
+    setUserAnswers(checkedAnswers as UserAnswer[]);
     
     const currentScore = {
       correct: correctCount,
@@ -131,7 +137,7 @@ export const useTestSolver = (testId: string | undefined) => {
       saveTestResults(
         test.id,
         test.name,
-        checkedAnswers,
+        checkedAnswers as UserAnswer[],
         user?.id
       );
     }

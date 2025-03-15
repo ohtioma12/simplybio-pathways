@@ -33,7 +33,7 @@ export interface TestSolverPageProps {
 // Unified UserAnswer interface compatible with statistics-service
 export interface UserAnswer {
   taskId: number;
-  answer?: string;
+  answer: string; // Changed from optional to required
   isCorrect?: boolean;
   // Fields for statistics-service compatibility
   taskCode?: string;
