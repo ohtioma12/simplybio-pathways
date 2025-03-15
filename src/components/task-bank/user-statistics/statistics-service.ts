@@ -1,17 +1,18 @@
+
 import { sampleTasks } from '../data';
 import { UserAnswer as TypesUserAnswer } from '../test-generator/types';
 
-// Simplified UserAnswer interface now that it's compatible with types.ts
+// Updated UserAnswer interface to make answer required
 export interface UserAnswer {
   taskId: number;
+  answer: string; // Now required
   taskCode?: string;
   taskTitle?: string;
-  userAnswer: string;
-  correctAnswer: string;
+  userAnswer?: string;
+  correctAnswer?: string;
   isCorrect: boolean;
   points?: number;
   maxPoints?: number;
-  answer?: string;
 }
 
 export interface SolvedTest {
@@ -31,12 +32,12 @@ export const convertUserAnswer = (answer: TypesUserAnswer): UserAnswer => {
     taskId: answer.taskId,
     taskCode: answer.taskCode,
     taskTitle: answer.taskTitle,
-    userAnswer: answer.answer || answer.userAnswer || '',
+    userAnswer: answer.userAnswer || answer.answer, // Use answer as fallback
     correctAnswer: answer.correctAnswer || '',
     isCorrect: answer.isCorrect || false,
     points: answer.points,
     maxPoints: answer.maxPoints,
-    answer: answer.answer
+    answer: answer.answer // Ensure this is always included
   };
 };
 
@@ -55,10 +56,16 @@ export const saveTestResults = (
 
     // Convert answers to the standard format if needed
     const standardizedAnswers = answers.map(answer => {
-      if (answer.answer && !answer.userAnswer) {
+      // Ensure answer is present
+      if (!answer.answer && answer.userAnswer) {
         return {
           ...answer,
-          userAnswer: answer.answer
+          answer: answer.userAnswer
+        };
+      } else if (!answer.answer) {
+        return {
+          ...answer,
+          answer: '' // Default to empty string if neither is present
         };
       }
       return answer;
