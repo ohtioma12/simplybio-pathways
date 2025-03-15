@@ -11,11 +11,13 @@ import { useNavigate } from 'react-router-dom';
 interface TelegramVerificationDialogProps {
   isOpen: boolean;
   onClose: () => void;
+  onVerifySuccess?: () => void;
 }
 
 const TelegramVerificationDialog: React.FC<TelegramVerificationDialogProps> = ({
   isOpen,
   onClose,
+  onVerifySuccess
 }) => {
   const navigate = useNavigate();
   const [telegramUsername, setTelegramUsername] = useState(
@@ -37,6 +39,9 @@ const TelegramVerificationDialog: React.FC<TelegramVerificationDialogProps> = ({
       localStorage.setItem('telegramUsername', telegramUsername);
       localStorage.setItem('telegramSubscribed', 'true');
       toast.success('Подписка на канал подтверждена!');
+      if (onVerifySuccess) {
+        onVerifySuccess();
+      }
       onClose();
     }, 1500);
   };
@@ -61,7 +66,7 @@ const TelegramVerificationDialog: React.FC<TelegramVerificationDialogProps> = ({
             <p className="flex items-start gap-2">
               <Link className="h-4 w-4 mt-0.5 shrink-0" />
               <span>
-                Наш Telegram канал содержит полезные материалы, обновления и подсказки по подготовке к экзаменам
+                Наш Telegram канал <a href="https://t.me/pro100_bio" target="_blank" rel="noopener noreferrer" className="font-medium underline">https://t.me/pro100_bio</a> содержит полезные материалы, обновления и подсказки по подготовке к экзаменам
               </span>
             </p>
           </div>

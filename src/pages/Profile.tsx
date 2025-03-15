@@ -2,6 +2,7 @@
 import React from 'react';
 import { useAuth } from '@/components/auth/AuthContext';
 import AdminDashboard from '@/components/admin/AdminDashboard';
+import UserStatistics from '@/components/task-bank/user-statistics/UserStatistics';
 
 const Profile = () => {
   const { user, isAdmin } = useAuth();
@@ -48,10 +49,8 @@ const Profile = () => {
             
             <div className="md:col-span-2">
               <div className="bg-white p-6 rounded-lg shadow-md">
-                <h3 className="text-lg font-semibold mb-4">Мои данные</h3>
-                <p className="text-gray-500">
-                  Здесь будет отображаться информация о ваших решенных вариантах и результатах.
-                </p>
+                <h3 className="text-lg font-semibold mb-4">Моя статистика</h3>
+                <UserStatistics userId={user.id} />
               </div>
             </div>
           </div>

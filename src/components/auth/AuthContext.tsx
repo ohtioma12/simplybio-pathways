@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
@@ -63,7 +62,7 @@ const MOCK_USERS = [
     name: 'Student User',
     role: 'student' as UserRole,
   },
-  // Add new user account with regular user role
+  // User account with regular user role
   {
     id: '6',
     email: 'odisseyscoot@icloud.com',
