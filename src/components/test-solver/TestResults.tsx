@@ -22,6 +22,20 @@ interface TestResultsProps {
 }
 
 const TestResults: React.FC<TestResultsProps> = ({ score, answers }) => {
+  // Calculate total points
+  const totalEarnedPoints = answers.reduce((total, answer) => {
+    return total + (answer.isCorrect ? (answer.maxPoints || 1) : 0);
+  }, 0);
+  
+  const totalPossiblePoints = answers.reduce((total, answer) => {
+    return total + (answer.maxPoints || 1);
+  }, 0);
+  
+  // Calculate percentage for progress bar
+  const progressPercentage = totalPossiblePoints > 0 
+    ? (totalEarnedPoints / totalPossiblePoints) * 100 
+    : 0;
+  
   return (
     <div className="space-y-6 mb-6">
       <Card className="bg-slate-50">
@@ -31,11 +45,11 @@ const TestResults: React.FC<TestResultsProps> = ({ score, answers }) => {
         <CardContent>
           <div className="space-y-4">
             <p className="text-lg font-medium">
-              Вы ответили правильно на {score.correct} из {score.total} вопросов
-              ({Math.round((score.correct / score.total) * 100)}%)
+              Вы набрали {totalEarnedPoints} из {totalPossiblePoints} баллов
+              ({Math.round(progressPercentage)}%)
             </p>
             <Progress 
-              value={(score.correct / score.total) * 100} 
+              value={progressPercentage} 
               className="h-2" 
             />
           </div>
@@ -53,6 +67,7 @@ const TestResults: React.FC<TestResultsProps> = ({ score, answers }) => {
                 <TableHead>Задание</TableHead>
                 <TableHead>Ваш ответ</TableHead>
                 <TableHead>Результат</TableHead>
+                <TableHead className="text-right">Баллы</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -75,6 +90,9 @@ const TestResults: React.FC<TestResultsProps> = ({ score, answers }) => {
                         Неверно
                       </span>
                     )}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {answer.isCorrect ? (answer.maxPoints || 1) : 0} / {answer.maxPoints || 1}
                   </TableCell>
                 </TableRow>
               ))}

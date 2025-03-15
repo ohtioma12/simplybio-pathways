@@ -28,7 +28,6 @@ export const useTestSolver = (testId: string | undefined) => {
   });
   const [resultsMode, setResultsMode] = useState(false);
   const [score, setScore] = useState({ correct: 0, total: 0 });
-  const [showDetailedResults, setShowDetailedResults] = useState(false);
   const [showStatistics, setShowStatistics] = useState(false);
   
   useEffect(() => {
@@ -130,7 +129,6 @@ export const useTestSolver = (testId: string | undefined) => {
     
     setScore(currentScore);
     setResultsMode(true);
-    setShowDetailedResults(true);
     setShowStatistics(true);
     
     if (test) {
@@ -144,8 +142,14 @@ export const useTestSolver = (testId: string | undefined) => {
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
-    const percentage = Math.round((correctCount / userAnswers.length) * 100);
-    toast.success(`Тест завершен! Ваш результат: ${correctCount} из ${userAnswers.length} (${percentage}%)`);
+    // Calculate points instead of percentage
+    const totalEarnedPoints = checkedAnswers.reduce((sum, answer) => 
+      sum + (answer.isCorrect ? ((answer as any).points || 1) : 0), 0);
+    
+    const totalPossiblePoints = checkedAnswers.reduce((sum, answer) => 
+      sum + ((answer as any).maxPoints || 1), 0);
+    
+    toast.success(`Тест завершен! Ваш результат: ${totalEarnedPoints} из ${totalPossiblePoints} баллов`);
     
     if (test) {
       try {
@@ -180,8 +184,6 @@ export const useTestSolver = (testId: string | undefined) => {
     setPdfOptions,
     resultsMode,
     score,
-    showDetailedResults,
-    setShowDetailedResults,
     showStatistics,
     setShowStatistics,
     handleAnswerChange,

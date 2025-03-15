@@ -9,6 +9,8 @@ import { Task } from './TaskCard';
 import { usePermissions } from '@/hooks/use-permissions';
 import TelegramVerificationDialog from './TelegramVerificationDialog';
 import { Button } from '@/components/ui/button';
+import { AlertTriangle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface TaskBankLayoutProps {
   tasks: Task[];
@@ -57,26 +59,64 @@ const TaskBankLayout: React.FC<TaskBankLayoutProps> = ({
   const [showTelegramDialog, setShowTelegramDialog] = useState(false);
   const [telegramChecked, setTelegramChecked] = useState(false);
 
-  // Check if we need to show the verification dialog
+  // Verify telegram subscription
   useEffect(() => {
-    const hasShownDialog = localStorage.getItem('telegramDialogShown') === 'true';
+    // Always check subscription status when component loads
     const isSubscribed = localStorage.getItem('telegramSubscribed') === 'true';
-    
-    if (isAuthenticated && !isSubscribed && !hasShownDialog) {
-      setShowTelegramDialog(true);
-      localStorage.setItem('telegramDialogShown', 'true');
-    }
-    
     setTelegramChecked(isSubscribed);
+    
+    // Show dialog for authenticated users who aren't subscribed
+    if (isAuthenticated && !isSubscribed) {
+      setShowTelegramDialog(true);
+    }
   }, [isAuthenticated]);
 
   const handleVerifySuccess = () => {
     setTelegramChecked(true);
   };
+  
+  // Periodically check telegram subscription (every 5 minutes)
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    
+    // Function to simulate checking subscription status
+    const checkSubscriptionStatus = () => {
+      // In a real app, this would make an API call to verify subscription
+      const isSubscribed = localStorage.getItem('telegramSubscribed') === 'true';
+      
+      // If subscription was revoked, show notification
+      if (telegramChecked && !isSubscribed) {
+        setTelegramChecked(false);
+        setShowTelegramDialog(true);
+      }
+    };
+    
+    // Check every 5 minutes
+    const intervalId = setInterval(checkSubscriptionStatus, 5 * 60 * 1000);
+    
+    return () => clearInterval(intervalId);
+  }, [isAuthenticated, telegramChecked]);
 
   return (
     <section className="py-12 bg-slate-50">
       <div className="container mx-auto px-4">
+        {/* Show subscription alert if authenticated but not verified */}
+        {isAuthenticated && !telegramChecked && (
+          <Alert className="mb-6 border-amber-200 bg-amber-50">
+            <AlertTriangle className="h-4 w-4 text-amber-600" />
+            <AlertDescription className="text-amber-700">
+              Для доступа к заданиям необходимо подписаться на Telegram канал Pro100 Bio.
+              <Button 
+                variant="link" 
+                className="p-0 h-auto text-amber-700 underline ml-1" 
+                onClick={() => setShowTelegramDialog(true)}
+              >
+                Подписаться сейчас
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+      
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Task Filters */}
           <div className="lg:w-1/4">

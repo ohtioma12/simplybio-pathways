@@ -11,9 +11,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { getUserSolvedTests, SolvedTest } from './statistics-service';
+import { ExternalLink, FileText } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface UserStatisticsProps {
   userId?: string;
@@ -44,14 +47,21 @@ const UserStatistics: React.FC<UserStatisticsProps> = ({ userId }) => {
     );
   }
 
-  // Calculate overall statistics
-  const totalAnswered = solvedTests.reduce((acc, test) => acc + test.answers.length, 0);
-  const totalCorrect = solvedTests.reduce(
-    (acc, test) => acc + test.answers.filter(a => a.isCorrect).length, 
-    0
-  );
-  const overallPercentage = totalAnswered > 0 
-    ? Math.round((totalCorrect / totalAnswered) * 100) 
+  // Calculate overall statistics (now using points)
+  const totalPoints = solvedTests.reduce((acc, test) => {
+    const earnedPoints = test.answers.reduce((sum, answer) => 
+      sum + (answer.isCorrect ? (answer.points || 1) : 0), 0);
+    return acc + earnedPoints;
+  }, 0);
+  
+  const totalPossiblePoints = solvedTests.reduce((acc, test) => {
+    const possiblePoints = test.answers.reduce((sum, answer) => 
+      sum + (answer.maxPoints || 1), 0);
+    return acc + possiblePoints;
+  }, 0);
+  
+  const overallPercentage = totalPossiblePoints > 0 
+    ? Math.round((totalPoints / totalPossiblePoints) * 100) 
     : 0;
 
   return (
@@ -63,19 +73,20 @@ const UserStatistics: React.FC<UserStatisticsProps> = ({ userId }) => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{solvedTests.length}</div>
+            <div className="text-xs text-muted-foreground mt-1">ID пользователя: {userId}</div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Решено заданий</CardTitle>
+            <CardTitle className="text-sm font-medium">Набрано баллов</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalAnswered}</div>
+            <div className="text-2xl font-bold">{totalPoints} из {totalPossiblePoints}</div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Средний балл</CardTitle>
+            <CardTitle className="text-sm font-medium">Средний результат</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{overallPercentage}%</div>
@@ -96,15 +107,17 @@ const UserStatistics: React.FC<UserStatisticsProps> = ({ userId }) => {
               <TableRow>
                 <TableHead>Название варианта</TableHead>
                 <TableHead>Дата</TableHead>
-                <TableHead>Правильно</TableHead>
-                <TableHead>Результат</TableHead>
+                <TableHead>Баллы</TableHead>
+                <TableHead>Действия</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {solvedTests.map((test) => {
-                const correctCount = test.answers.filter(a => a.isCorrect).length;
-                const totalCount = test.answers.length;
-                const percentage = Math.round((correctCount / totalCount) * 100);
+                const earnedPoints = test.answers.reduce((sum, answer) => 
+                  sum + (answer.isCorrect ? (answer.points || 1) : 0), 0);
+                const totalPoints = test.answers.reduce((sum, answer) => 
+                  sum + (answer.maxPoints || 1), 0);
+                const percentage = totalPoints > 0 ? Math.round((earnedPoints / totalPoints) * 100) : 0;
                 
                 return (
                   <TableRow key={test.testId}>
@@ -112,12 +125,19 @@ const UserStatistics: React.FC<UserStatisticsProps> = ({ userId }) => {
                     <TableCell>
                       {format(new Date(test.completedAt), 'dd MMM yyyy', { locale: ru })}
                     </TableCell>
-                    <TableCell>{correctCount} из {totalCount}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <span>{percentage}%</span>
+                        <span>{earnedPoints} из {totalPoints}</span>
                         <Progress value={percentage} className="h-2 w-20" />
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <Link to={`/test-solver/${test.testId}`}>
+                        <Button size="sm" variant="outline" className="flex items-center gap-1">
+                          <ExternalLink className="h-3 w-3" />
+                          Просмотр решения
+                        </Button>
+                      </Link>
                     </TableCell>
                   </TableRow>
                 );
@@ -133,7 +153,7 @@ const UserStatistics: React.FC<UserStatisticsProps> = ({ userId }) => {
                 <TableHead>Код задания</TableHead>
                 <TableHead>Название</TableHead>
                 <TableHead>Количество попыток</TableHead>
-                <TableHead>Результат</TableHead>
+                <TableHead>Успешность</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -144,8 +164,8 @@ const UserStatistics: React.FC<UserStatisticsProps> = ({ userId }) => {
                   <TableCell>{task.attempts}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <span>{task.successRate}%</span>
-                      <Progress value={task.successRate} className="h-2 w-20" />
+                      <span>{task.earnedPoints} из {task.totalPoints} баллов</span>
+                      <Progress value={(task.earnedPoints/task.totalPoints)*100} className="h-2 w-20" />
                     </div>
                   </TableCell>
                 </TableRow>
@@ -158,14 +178,15 @@ const UserStatistics: React.FC<UserStatisticsProps> = ({ userId }) => {
   );
 };
 
-// Helper function to aggregate task statistics
+// Helper function to aggregate task statistics with points
 function getTaskStatistics(solvedTests: SolvedTest[]) {
   const taskMap: Record<string, {
     taskId: number;
     taskCode: string;
     taskTitle: string;
     attempts: number;
-    correct: number;
+    earnedPoints: number;
+    totalPoints: number;
   }> = {};
 
   // Collect statistics for each task
@@ -179,23 +200,22 @@ function getTaskStatistics(solvedTests: SolvedTest[]) {
           taskCode: answer.taskCode || `Задание ${answer.taskId}`,
           taskTitle: answer.taskTitle || 'Неизвестное задание',
           attempts: 0,
-          correct: 0
+          earnedPoints: 0,
+          totalPoints: 0
         };
       }
       
       taskMap[key].attempts += 1;
+      taskMap[key].totalPoints += (answer.maxPoints || 1);
+      
       if (answer.isCorrect) {
-        taskMap[key].correct += 1;
+        taskMap[key].earnedPoints += (answer.points || 1);
       }
     });
   });
 
-  // Convert to array and calculate success rate
+  // Convert to array
   return Object.values(taskMap)
-    .map(task => ({
-      ...task,
-      successRate: Math.round((task.correct / task.attempts) * 100)
-    }))
     .sort((a, b) => b.attempts - a.attempts);
 }
 

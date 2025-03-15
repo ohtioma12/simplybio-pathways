@@ -12,8 +12,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Edit2, Save, X } from 'lucide-react';
+import { Edit2, Save, X, Share2, Copy, Link as LinkIcon } from 'lucide-react';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 // Sample ready-made tests structure from ReadyMadeTests.tsx
 const initialTests = [
@@ -30,19 +31,21 @@ const initialTests = [
 ];
 
 const ReadyMadeTestsEditor: React.FC = () => {
+  const navigate = useNavigate();
   const [tests, setTests] = useState(initialTests);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editData, setEditData] = useState({ name: '', taskIds: '' });
+  const [editData, setEditData] = useState({ id: '', name: '', taskIds: '' });
 
   const handleEdit = (test: any) => {
     setEditingId(test.id);
     setEditData({
+      id: test.id,
       name: test.name,
       taskIds: test.taskIds.join(', ')
     });
   };
 
-  const handleSave = (id: string) => {
+  const handleSave = (oldId: string) => {
     try {
       // Parse task IDs from comma-separated string
       const taskIdsArray = editData.taskIds
@@ -54,11 +57,24 @@ const ReadyMadeTestsEditor: React.FC = () => {
         toast.error('Необходимо указать хотя бы одно задание');
         return;
       }
+      
+      // Check if we need to update the ID
+      const newId = editData.id.trim();
+      if (!newId) {
+        toast.error('ID не может быть пустым');
+        return;
+      }
+      
+      // Check if new ID already exists (but not the same as current)
+      if (newId !== oldId && tests.some(t => t.id === newId)) {
+        toast.error('Вариант с таким ID уже существует');
+        return;
+      }
 
       const updatedTests = tests.map(test => {
-        if (test.id === id) {
+        if (test.id === oldId) {
           return {
-            ...test,
+            id: newId,
             name: editData.name || test.name,
             taskIds: taskIdsArray
           };
@@ -79,6 +95,12 @@ const ReadyMadeTestsEditor: React.FC = () => {
   const handleCancel = () => {
     setEditingId(null);
   };
+  
+  const copyTestLink = (testId: string) => {
+    const url = `${window.location.origin}/test-solver/${testId}`;
+    navigator.clipboard.writeText(url);
+    toast.success('Ссылка скопирована');
+  };
 
   return (
     <Card>
@@ -89,7 +111,7 @@ const ReadyMadeTestsEditor: React.FC = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
+              <TableHead>ID варианта</TableHead>
               <TableHead>Название</TableHead>
               <TableHead>Задания</TableHead>
               <TableHead>Действия</TableHead>
@@ -98,9 +120,14 @@ const ReadyMadeTestsEditor: React.FC = () => {
           <TableBody>
             {tests.map((test) => (
               <TableRow key={test.id}>
-                <TableCell>{test.id}</TableCell>
                 {editingId === test.id ? (
                   <>
+                    <TableCell>
+                      <Input
+                        value={editData.id}
+                        onChange={(e) => setEditData({ ...editData, id: e.target.value })}
+                      />
+                    </TableCell>
                     <TableCell>
                       <Input
                         value={editData.name}
@@ -132,6 +159,7 @@ const ReadyMadeTestsEditor: React.FC = () => {
                   </>
                 ) : (
                   <>
+                    <TableCell className="font-mono text-sm">{test.id}</TableCell>
                     <TableCell>{test.name}</TableCell>
                     <TableCell>
                       <div className="text-sm">
@@ -142,10 +170,36 @@ const ReadyMadeTestsEditor: React.FC = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Button size="sm" variant="outline" onClick={() => handleEdit(test)}>
-                        <Edit2 className="h-4 w-4 mr-1" />
-                        Изменить
-                      </Button>
+                      <div className="flex flex-col gap-2">
+                        <Button size="sm" variant="outline" onClick={() => handleEdit(test)}>
+                          <Edit2 className="h-4 w-4 mr-1" />
+                          Изменить
+                        </Button>
+                        <div className="flex gap-1">
+                          <Button size="sm" variant="ghost" className="flex-1 px-2" onClick={() => copyTestLink(test.id)}>
+                            <Copy className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="ghost" 
+                            className="flex-1 px-2"
+                            onClick={() => navigate(`/test-solver/${test.id}`)}
+                          >
+                            <LinkIcon className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="ghost" 
+                            className="flex-1 px-2"
+                            onClick={() => {
+                              copyTestLink(test.id);
+                              toast.success('Ссылка скопирована для отправки');
+                            }}
+                          >
+                            <Share2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
                     </TableCell>
                   </>
                 )}

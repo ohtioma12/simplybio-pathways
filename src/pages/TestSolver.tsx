@@ -9,7 +9,6 @@ import TestHeader from '@/components/test-solver/TestHeader';
 import TestResults from '@/components/test-solver/TestResults';
 import TaskItem from '@/components/test-solver/TaskItem';
 import CheckAnswersButton from '@/components/test-solver/CheckAnswersButton';
-import TestResultsDetailed from '@/components/test-solver/TestResultsDetailed';
 import UserStatistics from '@/components/task-bank/user-statistics/UserStatistics';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
@@ -27,8 +26,6 @@ const TestSolver: React.FC = () => {
     setPdfOptions,
     resultsMode,
     score,
-    showDetailedResults,
-    setShowDetailedResults,
     showStatistics,
     setShowStatistics,
     handleAnswerChange,
@@ -74,7 +71,7 @@ const TestSolver: React.FC = () => {
             answers={userAnswers}
           />
           
-          {/* Show detailed results and user statistics automatically after solving */}
+          {/* Show user statistics automatically after solving */}
           {showStatistics && user && (
             <div className="mb-6 mt-6">
               <h3 className="text-xl font-bold mb-4">Моя статистика</h3>
@@ -82,15 +79,68 @@ const TestSolver: React.FC = () => {
             </div>
           )}
           
-          {showDetailedResults && (
-            <TestResultsDetailed
-              isOpen={showDetailedResults}
-              onClose={() => setShowDetailedResults(false)}
-              userAnswers={userAnswers}
-              taskDetails={taskDetails}
-              sampleTasks={sampleTasks}
-            />
-          )}
+          {/* Detailed results now appear on the page, not in a modal */}
+          <div className="space-y-6 mb-6 mt-6">
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h3 className="text-xl font-bold mb-4">Подробные результаты</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50 border-b">
+                      <th className="p-3 text-left font-semibold w-12">№</th>
+                      <th className="p-3 text-left font-semibold">Код задания</th>
+                      <th className="p-3 text-left font-semibold">Ваш ответ</th>
+                      <th className="p-3 text-left font-semibold">Правильный ответ</th>
+                      <th className="p-3 text-center font-semibold w-20">Результат</th>
+                      <th className="p-3 text-right font-semibold w-24">Баллы</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {userAnswers.map((answer, index) => {
+                      const taskOption = taskDetails.find(t => t.id === answer.taskId);
+                      const task = sampleTasks.find(t => t.id === answer.taskId);
+                      
+                      // Get correct answers
+                      const correctAnswers = task && (task as any).correctAnswers 
+                        ? (task as any).correctAnswers 
+                        : task?.correctAnswer 
+                          ? [task.correctAnswer] 
+                          : ['Н/Д'];
+                      
+                      // Check if the task has defined points, if not default to 1
+                      const maxPoints = (task as any)?.points || 1;
+                      const earnedPoints = answer.isCorrect ? maxPoints : 0;
+                      
+                      return (
+                        <tr key={answer.taskId} className="border-b hover:bg-slate-50">
+                          <td className="p-3 font-medium">{index + 1}</td>
+                          <td className="p-3">{taskOption?.taskCode || `Задание ${answer.taskId}`}</td>
+                          <td className={`p-3 ${answer.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
+                            {answer.answer || '-'}
+                          </td>
+                          <td className="p-3">{correctAnswers.join(' или ')}</td>
+                          <td className="p-3 text-center">
+                            {answer.isCorrect ? (
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                Верно
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                Неверно
+                              </span>
+                            )}
+                          </td>
+                          <td className="p-3 text-right">
+                            {earnedPoints} из {maxPoints}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </>
       )}
       
