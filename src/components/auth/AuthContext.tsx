@@ -63,13 +63,13 @@ const MOCK_USERS = [
     name: 'Student User',
     role: 'student' as UserRole,
   },
-  // Add new user account
+  // Add new user account with regular user role
   {
     id: '6',
     email: 'odisseyscoot@icloud.com',
     password: 'Odissey2004',
     name: 'Odissey Scoot',
-    role: 'admin' as UserRole,
+    role: 'user' as UserRole,
   }
 ];
 
