@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
 import { generateTestPdf } from '@/components/task-bank/test-generator/pdfGenerator';
 import { ExtendedTask } from '@/components/task-bank/test-generator/types';
@@ -10,12 +10,14 @@ import TestResults from '@/components/test-solver/TestResults';
 import TaskItem from '@/components/test-solver/TaskItem';
 import CheckAnswersButton from '@/components/test-solver/CheckAnswersButton';
 import TestResultsDetailed from '@/components/test-solver/TestResultsDetailed';
+import UserStatistics from '@/components/task-bank/user-statistics/UserStatistics';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
+import { useAuth } from '@/components/auth/AuthContext';
 
 const TestSolver: React.FC = () => {
   const { testId } = useParams<{ testId: string }>();
-  const [showDetailedResults, setShowDetailedResults] = useState(false);
+  const { user } = useAuth();
   
   const {
     test,
@@ -25,6 +27,10 @@ const TestSolver: React.FC = () => {
     setPdfOptions,
     resultsMode,
     score,
+    showDetailedResults,
+    setShowDetailedResults,
+    showStatistics,
+    setShowStatistics,
     handleAnswerChange,
     checkAllAnswers
   } = useTestSolver(testId);
@@ -65,15 +71,13 @@ const TestSolver: React.FC = () => {
         <>
           <TestResults score={score} />
           
-          <div className="mb-6 flex justify-end">
-            <Button 
-              variant="outline" 
-              onClick={() => setShowDetailedResults(true)}
-              className="flex items-center gap-2"
-            >
-              Подробные результаты
-            </Button>
-          </div>
+          {/* Show detailed results and user statistics automatically after solving */}
+          {showStatistics && user && (
+            <div className="mb-6 mt-6">
+              <h3 className="text-xl font-bold mb-4">Моя статистика</h3>
+              <UserStatistics userId={user.id} />
+            </div>
+          )}
           
           {showDetailedResults && (
             <TestResultsDetailed
@@ -87,7 +91,7 @@ const TestSolver: React.FC = () => {
         </>
       )}
       
-      <div className="space-y-6">
+      <div className="space-y-6 mt-6">
         {taskDetails.map((task, index) => {
           const fullTask = sampleTasks.find(t => t.id === task.id) as ExtendedTask | undefined;
           if (!fullTask) return null;

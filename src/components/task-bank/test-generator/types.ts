@@ -30,12 +30,12 @@ export interface TestSolverPageProps {
   testId: string;
 }
 
-// Modified UserAnswer to be compatible with statistics-service
+// Unified UserAnswer interface compatible with statistics-service
 export interface UserAnswer {
   taskId: number;
-  answer: string;
+  answer?: string;
   isCorrect?: boolean;
-  // Adding the following fields to make it compatible with the statistics-service version
+  // Fields for statistics-service compatibility
   taskCode?: string;
   taskTitle?: string;
   userAnswer?: string;

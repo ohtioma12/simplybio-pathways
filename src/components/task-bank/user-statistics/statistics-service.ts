@@ -1,8 +1,7 @@
-
 import { sampleTasks } from '../data';
 import { UserAnswer as TypesUserAnswer } from '../test-generator/types';
 
-// Extended the UserAnswer interface to be compatible with both use cases
+// Simplified UserAnswer interface now that it's compatible with types.ts
 export interface UserAnswer {
   taskId: number;
   taskCode?: string;
@@ -12,7 +11,6 @@ export interface UserAnswer {
   isCorrect: boolean;
   points?: number;
   maxPoints?: number;
-  // Adding this property to make it compatible with the types.ts version
   answer?: string;
 }
 
@@ -33,7 +31,7 @@ export const convertUserAnswer = (answer: TypesUserAnswer): UserAnswer => {
     taskId: answer.taskId,
     taskCode: answer.taskCode,
     taskTitle: answer.taskTitle,
-    userAnswer: answer.answer || '',
+    userAnswer: answer.answer || answer.userAnswer || '',
     correctAnswer: answer.correctAnswer || '',
     isCorrect: answer.isCorrect || false,
     points: answer.points,

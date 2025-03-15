@@ -63,6 +63,14 @@ const MOCK_USERS = [
     name: 'Student User',
     role: 'student' as UserRole,
   },
+  // Add new user account
+  {
+    id: '6',
+    email: 'odisseyscoot@icloud.com',
+    password: 'Odissey2004',
+    name: 'Odissey Scoot',
+    role: 'admin' as UserRole,
+  }
 ];
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

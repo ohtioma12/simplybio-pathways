@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { 
   SavedTest, 
@@ -28,8 +27,9 @@ export const useTestSolver = (testId: string | undefined) => {
   });
   const [resultsMode, setResultsMode] = useState(false);
   const [score, setScore] = useState({ correct: 0, total: 0 });
+  const [showDetailedResults, setShowDetailedResults] = useState(false);
+  const [showStatistics, setShowStatistics] = useState(false);
   
-  // Load test data
   useEffect(() => {
     if (!testId) return;
     
@@ -44,13 +44,11 @@ export const useTestSolver = (testId: string | undefined) => {
       const parsedTest: SavedTest = JSON.parse(testData);
       setTest(parsedTest);
       
-      // Load tasks details
       const taskIds = parsedTest.tasks;
       const tasksDetails = taskIds.map(id => {
         const task = sampleTasks.find(t => t.id === id);
         if (!task) return null;
         
-        // Generate taskCode
         const lineNumber = parseInt(task.line.replace('Линия ', ''), 10) || 0;
         const taskCode = `${lineNumber.toString().padStart(2, '0')}-${task.id.toString().padStart(3, '0')}`;
         
@@ -65,7 +63,6 @@ export const useTestSolver = (testId: string | undefined) => {
       
       setTaskDetails(tasksDetails);
       
-      // Initialize user answers
       setUserAnswers(taskIds.map(id => ({ taskId: id, answer: '' })));
       
     } catch (error) {
@@ -83,7 +80,7 @@ export const useTestSolver = (testId: string | undefined) => {
   };
   
   const checkAllAnswers = () => {
-    if (userAnswers.some(a => !a.answer.trim())) {
+    if (userAnswers.some(a => !a.answer?.trim())) {
       toast.error('Пожалуйста, ответьте на все вопросы перед проверкой');
       return;
     }
@@ -95,18 +92,16 @@ export const useTestSolver = (testId: string | undefined) => {
       
       if (!task) return userAnswer;
       
-      // Check against correctAnswers array if it exists, or use correctAnswer as fallback
       const correctAnswersArray = task.correctAnswers || (task.correctAnswer ? [task.correctAnswer] : []);
       
       if (correctAnswersArray.length === 0) return userAnswer;
       
       const isCorrect = correctAnswersArray.some(
-        answer => userAnswer.answer.trim().toLowerCase() === answer.toLowerCase()
+        answer => userAnswer.answer?.trim().toLowerCase() === answer.toLowerCase()
       );
       
       if (isCorrect) correctCount++;
       
-      // Create a properly typed answer object
       return {
         taskId: userAnswer.taskId,
         answer: userAnswer.answer,
@@ -120,7 +115,6 @@ export const useTestSolver = (testId: string | undefined) => {
       } as UserAnswer;
     });
     
-    // Update user answers with the checked results
     setUserAnswers(checkedAnswers);
     
     const currentScore = {
@@ -130,8 +124,9 @@ export const useTestSolver = (testId: string | undefined) => {
     
     setScore(currentScore);
     setResultsMode(true);
+    setShowDetailedResults(true);
+    setShowStatistics(true);
     
-    // Save results to user statistics
     if (test) {
       saveTestResults(
         test.id,
@@ -141,12 +136,34 @@ export const useTestSolver = (testId: string | undefined) => {
       );
     }
     
-    // Scroll to top to show results
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
-    // Show toast with result
     const percentage = Math.round((correctCount / userAnswers.length) * 100);
     toast.success(`Тест завершен! Ваш результат: ${correctCount} из ${userAnswers.length} (${percentage}%)`);
+    
+    if (test) {
+      try {
+        import('@/components/task-bank/test-generator/pdfGenerator').then(module => {
+          const taskOptions = taskDetails.map(task => ({
+            ...task,
+            selected: true
+          }));
+          
+          module.generateTestPdf(
+            test.name, 
+            taskOptions, 
+            {
+              includeExplanations: true,
+              includeAnswerKey: true
+            },
+            sampleTasks
+          );
+        });
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+        toast.error('Ошибка при генерации PDF');
+      }
+    }
   };
   
   return {
@@ -157,6 +174,10 @@ export const useTestSolver = (testId: string | undefined) => {
     setPdfOptions,
     resultsMode,
     score,
+    showDetailedResults,
+    setShowDetailedResults,
+    showStatistics,
+    setShowStatistics,
     handleAnswerChange,
     checkAllAnswers
   };

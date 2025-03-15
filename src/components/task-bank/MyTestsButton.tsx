@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, BarChart } from 'lucide-react';
@@ -15,10 +14,11 @@ import { getUserTests, deleteTest, generateTestPdf } from './test-generator/pdfG
 import { sampleTasks } from './data';
 import { toast } from 'sonner';
 
-// Import our new components
+// Import components
 import PdfOptionsSection from './my-tests/PdfOptionsSection';
 import TestsTable from './my-tests/TestsTable';
 import ShareTestDialog from './my-tests/ShareTestDialog';
+import UserStatistics from './user-statistics/UserStatistics';
 
 const MyTestsButton: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
@@ -77,7 +77,7 @@ const MyTestsButton: React.FC = () => {
       // Generate taskCode if it doesn't exist
       const lineNumber = parseInt(taskDetails.line.replace('Линия ', ''), 10) || 0;
       
-      // Use a type assertion to tell TypeScript that we're handling the case where taskCode might not exist
+      // Fixed the error by renaming from task to taskDetails
       const generatedTaskCode = (taskDetails as any).taskCode || 
         `${lineNumber.toString().padStart(2, '0')}-${(taskId % 1000).toString().padStart(3, '0')}`;
       
@@ -173,8 +173,5 @@ const MyTestsButton: React.FC = () => {
     </>
   );
 };
-
-// Import UserStatistics component
-import UserStatistics from './user-statistics/UserStatistics';
 
 export default MyTestsButton;
