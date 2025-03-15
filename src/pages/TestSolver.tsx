@@ -69,7 +69,10 @@ const TestSolver: React.FC = () => {
       
       {resultsMode && (
         <>
-          <TestResults score={score} />
+          <TestResults 
+            score={score} 
+            answers={userAnswers}
+          />
           
           {/* Show detailed results and user statistics automatically after solving */}
           {showStatistics && user && (
