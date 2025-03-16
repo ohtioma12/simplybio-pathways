@@ -113,6 +113,21 @@ export const getUserSolvedTests = (userId?: string): SolvedTest[] => {
   }
 };
 
+export const deleteUserTest = (testId: string, userId?: string): boolean => {
+  try {
+    const userSolvedTestsKey = `user_solved_tests_${userId || 'anonymous'}`;
+    const userSolvedTests = JSON.parse(localStorage.getItem(userSolvedTestsKey) || '[]');
+    
+    const updatedTests = userSolvedTests.filter((test: SolvedTest) => test.testId !== testId);
+    
+    localStorage.setItem(userSolvedTestsKey, JSON.stringify(updatedTests));
+    return true;
+  } catch (error) {
+    console.error('Error deleting user test:', error);
+    return false;
+  }
+};
+
 export const getTaskDetails = (taskId: number) => {
   const task = sampleTasks.find(t => t.id === taskId);
   if (!task) return null;

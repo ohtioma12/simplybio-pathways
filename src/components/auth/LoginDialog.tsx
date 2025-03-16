@@ -65,7 +65,9 @@ const LoginDialog: React.FC<LoginDialogProps> = ({
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="password">Пароль</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Пароль</Label>
+              </div>
               <Input
                 id="password"
                 type="password"

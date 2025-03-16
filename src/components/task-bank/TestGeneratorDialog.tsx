@@ -84,7 +84,7 @@ const TestGeneratorDialog: React.FC<TestGeneratorDialogProps> = ({ tasks }) => {
   };
 
   return (
-    <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
       <DialogHeader>
         <DialogTitle>Генерация варианта ЕГЭ</DialogTitle>
         <DialogDescription>
@@ -169,9 +169,11 @@ const TestGeneratorDialog: React.FC<TestGeneratorDialogProps> = ({ tasks }) => {
         </div>
       </div>
       
-      <DialogFooter className="mt-6">
-        <Button variant="outline" onClick={handleGeneratePDF}>Скачать PDF</Button>
-        <Button onClick={handleGenerateTest}>Создать вариант</Button>
+      <DialogFooter className="mt-6 flex justify-end">
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleGeneratePDF}>Скачать PDF</Button>
+          <Button onClick={handleGenerateTest}>Создать вариант</Button>
+        </div>
       </DialogFooter>
     </DialogContent>
   );

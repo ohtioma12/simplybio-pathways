@@ -59,24 +59,27 @@ const TestResults: React.FC<TestResultsProps> = ({ score, answers }) => {
         <CardHeader>
           <CardTitle>Детальные результаты</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Задание</TableHead>
+                <TableHead>№</TableHead>
+                <TableHead>Код задания</TableHead>
                 <TableHead>Ваш ответ</TableHead>
+                <TableHead>Правильный ответ</TableHead>
                 <TableHead>Результат</TableHead>
                 <TableHead className="text-right">Баллы</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {answers.map((answer) => (
+              {answers.map((answer, index) => (
                 <TableRow key={answer.taskId}>
+                  <TableCell>{index + 1}</TableCell>
                   <TableCell>
-                    <div className="font-medium">Задание {answer.taskId}</div>
-                    <div className="text-xs text-muted-foreground">{answer.taskCode}</div>
+                    <div className="font-medium">{answer.taskCode || `Задание ${answer.taskId}`}</div>
                   </TableCell>
                   <TableCell>{answer.answer || '-'}</TableCell>
+                  <TableCell>{answer.correctAnswer || '-'}</TableCell>
                   <TableCell>
                     {answer.isCorrect ? (
                       <span className="flex items-center text-green-600">

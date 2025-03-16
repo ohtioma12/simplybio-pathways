@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
@@ -9,6 +8,7 @@ export interface User {
   email: string;
   name: string;
   role: UserRole;
+  phone?: string;
 }
 
 interface AuthContextType {
@@ -25,6 +25,7 @@ interface AuthContextType {
   deleteUser: (userId: string) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   verifyEmail: (email: string, code: string) => Promise<boolean>;
+  updateUserInfo: (userId: string, data: Partial<User>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -37,6 +38,7 @@ const MOCK_USERS = [
     password: 'admin123',
     name: 'Admin User',
     role: 'admin' as UserRole,
+    phone: '+7 999 123 45 67'
   },
   {
     id: '2',
@@ -44,6 +46,7 @@ const MOCK_USERS = [
     password: 'user123',
     name: 'Regular User',
     role: 'user' as UserRole,
+    phone: '+7 999 765 43 21'
   },
   {
     id: '3',
@@ -51,6 +54,7 @@ const MOCK_USERS = [
     password: 'Odissey13',
     name: 'Odissey',
     role: 'admin' as UserRole,
+    phone: '+7 999 111 22 33'
   },
   {
     id: '4',
@@ -66,7 +70,6 @@ const MOCK_USERS = [
     name: 'Student User',
     role: 'student' as UserRole,
   },
-  // User account with regular user role
   {
     id: '6',
     email: 'odisseyscoot@icloud.com',
@@ -154,6 +157,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     toast.info('Вы вышли из системы');
   };
 
+  const updateUserInfo = async (userId: string, data: Partial<User>) => {
+    setIsLoading(true);
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Update users array
+      const updatedUsers = users.map(u => {
+        if (u.id === userId) {
+          return { ...u, ...data };
+        }
+        return u;
+      });
+      
+      setUsers(updatedUsers);
+      
+      // If the updated user is the current user, update current user state
+      if (user && user.id === userId) {
+        const updatedUser = { ...user, ...data };
+        setUser(updatedUser);
+        localStorage.setItem('prostoUser', JSON.stringify(updatedUser));
+      }
+      
+      toast.success('Информация пользователя обновлена');
+    } catch (error) {
+      toast.error('Ошибка при обновлении информации пользователя');
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const deleteUser = async (userId: string) => {
     setIsLoading(true);
     
@@ -206,8 +242,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
   const verifyEmail = async (email: string, code: string) => {
     // In a real app, verify the code with an API
-    // For demo purposes, we'll just return true
-    return true;
+    // For demo purposes, we'll check if code is '123456'
+    return code === '123456';
   };
 
   const isTelegramVerified = localStorage.getItem('telegramSubscribed') === 'true';
@@ -228,6 +264,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         deleteUser,
         resetPassword,
         verifyEmail,
+        updateUserInfo,
       }}
     >
       {children}
