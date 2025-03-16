@@ -146,7 +146,7 @@ const RegisterDialog: React.FC<RegisterDialogProps> = ({
         isOpen={showVerification}
         onClose={() => setShowVerification(false)}
         email={email}
-        onVerificationSuccess={handleVerificationSuccess}
+        onVerifySuccess={handleVerificationSuccess}
       />
     </>
   );
