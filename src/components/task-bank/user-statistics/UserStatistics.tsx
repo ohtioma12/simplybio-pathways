@@ -7,7 +7,7 @@ import StatisticsCards from './StatisticsCards';
 import TestsTable from './TestsTable';
 import TasksTable from './TasksTable';
 import TestDetailsDialog from './TestDetailsDialog';
-import { getTaskStatistics } from './utils';
+import { getTaskStatistics, calculateOverallStatistics } from './utils';
 
 interface UserStatisticsProps {
   userId?: string;
@@ -65,23 +65,8 @@ const UserStatistics: React.FC<UserStatisticsProps> = ({ userId }) => {
     );
   }
 
-  // Calculate overall statistics (now using points)
-  const totalPoints = solvedTests.reduce((acc, test) => {
-    const earnedPoints = test.answers.reduce((sum, answer) => 
-      sum + (answer.isCorrect ? (answer.points || 1) : 0), 0);
-    return acc + earnedPoints;
-  }, 0);
-  
-  const totalPossiblePoints = solvedTests.reduce((acc, test) => {
-    const possiblePoints = test.answers.reduce((sum, answer) => 
-      sum + (answer.maxPoints || 1), 0);
-    return acc + possiblePoints;
-  }, 0);
-  
-  const overallPercentage = totalPossiblePoints > 0 
-    ? Math.round((totalPoints / totalPossiblePoints) * 100) 
-    : 0;
-
+  // Get statistics using the extracted utility functions
+  const { totalPoints, totalPossiblePoints, overallPercentage } = calculateOverallStatistics(solvedTests);
   const selectedTest = getSelectedTest();
   const taskStats = getTaskStatistics(solvedTests);
 

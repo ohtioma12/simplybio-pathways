@@ -41,3 +41,28 @@ export function getTaskStatistics(solvedTests: SolvedTest[]) {
   return Object.values(taskMap)
     .sort((a, b) => b.attempts - a.attempts);
 }
+
+// Calculate overall statistics from solved tests
+export function calculateOverallStatistics(solvedTests: SolvedTest[]) {
+  const totalPoints = solvedTests.reduce((acc, test) => {
+    const earnedPoints = test.answers.reduce((sum, answer) => 
+      sum + (answer.isCorrect ? (answer.points || 1) : 0), 0);
+    return acc + earnedPoints;
+  }, 0);
+  
+  const totalPossiblePoints = solvedTests.reduce((acc, test) => {
+    const possiblePoints = test.answers.reduce((sum, answer) => 
+      sum + (answer.maxPoints || 1), 0);
+    return acc + possiblePoints;
+  }, 0);
+  
+  const overallPercentage = totalPossiblePoints > 0 
+    ? Math.round((totalPoints / totalPossiblePoints) * 100) 
+    : 0;
+
+  return {
+    totalPoints,
+    totalPossiblePoints,
+    overallPercentage
+  };
+}
