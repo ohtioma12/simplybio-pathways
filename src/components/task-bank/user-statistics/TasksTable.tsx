@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Progress } from '@/components/ui/progress';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Table,
   TableBody,
@@ -9,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { SolvedTest } from './statistics-service';
+import { Link } from 'react-router-dom';
 
 interface TasksTableProps {
   taskStatistics: Array<{
@@ -24,9 +25,9 @@ interface TasksTableProps {
 
 const TasksTable: React.FC<TasksTableProps> = ({ taskStatistics }) => {
   return (
-    <div className="overflow-x-auto">
+    <ScrollArea className="h-[300px]">
       <Table>
-        <TableHeader className="sticky top-[41px] bg-white z-10">
+        <TableHeader className="sticky top-0 bg-white z-10">
           <TableRow>
             <TableHead>Код задания</TableHead>
             <TableHead>Название</TableHead>
@@ -37,7 +38,11 @@ const TasksTable: React.FC<TasksTableProps> = ({ taskStatistics }) => {
         <TableBody>
           {taskStatistics.map((task) => (
             <TableRow key={task.taskId}>
-              <TableCell className="font-medium">{task.taskCode}</TableCell>
+              <TableCell className="font-medium">
+                <Link to={`/task/${task.taskId}`} className="text-blue-600 hover:underline">
+                  {task.taskCode}
+                </Link>
+              </TableCell>
               <TableCell>{task.taskTitle}</TableCell>
               <TableCell>{task.attempts}</TableCell>
               <TableCell>
@@ -50,7 +55,7 @@ const TasksTable: React.FC<TasksTableProps> = ({ taskStatistics }) => {
           ))}
         </TableBody>
       </Table>
-    </div>
+    </ScrollArea>
   );
 };
 

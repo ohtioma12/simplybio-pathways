@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 import {
   Card,
   CardContent,
@@ -102,9 +103,13 @@ const TaskCard: React.FC<TaskCardProps> = ({
               <div className="text-xs font-medium px-2.5 py-1 bg-prosto-blue-light/50 text-prosto-blue rounded-full">
                 {task.difficulty}
               </div>
-              <div className="text-xs font-medium px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full">
+              <Link 
+                to={`/task/${task.id}`} 
+                className="text-xs font-medium px-2.5 py-1 bg-slate-100 text-blue-600 hover:bg-slate-200 hover:text-blue-700 rounded-full transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
                 Код: {taskCode}
-              </div>
+              </Link>
             </div>
           </div>
         </CardHeader>

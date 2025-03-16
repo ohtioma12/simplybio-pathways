@@ -15,6 +15,8 @@ import NotFound from "./pages/NotFound";
 import TestSolver from "./pages/TestSolver";
 import Profile from "./pages/Profile";
 import { AuthProvider } from "./components/auth/AuthContext";
+import SingleTaskView from "./pages/SingleTaskView";
+import TestStatistics from "./pages/TestStatistics";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +38,8 @@ const App = () => (
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/test-solver/:testId" element={<TestSolver />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/profile/statistics/:testId" element={<TestStatistics />} />
+                <Route path="/task/:taskId" element={<SingleTaskView />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

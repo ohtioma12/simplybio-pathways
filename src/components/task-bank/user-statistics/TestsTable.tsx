@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { FileText, Trash2, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Table,
   TableBody,
@@ -28,9 +29,9 @@ const TestsTable: React.FC<TestsTableProps> = ({
   onViewDetails
 }) => {
   return (
-    <div className="overflow-x-auto">
+    <ScrollArea className="h-[300px]">
       <Table>
-        <TableHeader className="sticky top-[41px] bg-white z-10">
+        <TableHeader className="sticky top-0 bg-white z-10">
           <TableRow>
             <TableHead>Название варианта</TableHead>
             <TableHead>Дата</TableHead>
@@ -76,13 +77,14 @@ const TestsTable: React.FC<TestsTableProps> = ({
                       <Trash2 className="h-3 w-3" />
                     </Button>
                     
-                    <Button 
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => onViewDetails(test.testId)}
-                    >
-                      <ChevronRight className="h-3 w-3" />
-                    </Button>
+                    <Link to={`/profile/statistics/${test.testId}`}>
+                      <Button 
+                        size="sm"
+                        variant="ghost"
+                      >
+                        <ChevronRight className="h-3 w-3" />
+                      </Button>
+                    </Link>
                   </div>
                 </TableCell>
               </TableRow>
@@ -90,7 +92,7 @@ const TestsTable: React.FC<TestsTableProps> = ({
           })}
         </TableBody>
       </Table>
-    </div>
+    </ScrollArea>
   );
 };
 

@@ -8,9 +8,10 @@ import EmailVerificationDialog from '@/components/auth/EmailVerificationDialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { ExternalLink, Check, AlertTriangle, Edit, Phone, User } from 'lucide-react';
+import { ExternalLink, Check, AlertTriangle, Edit, Phone, User, Mail } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Profile = () => {
   const { user, isAdmin, updateUserInfo } = useAuth();
@@ -19,16 +20,20 @@ const Profile = () => {
   const [lastVerificationTime, setLastVerificationTime] = useState<number | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [showEmailVerification, setShowEmailVerification] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
   
   // User info state
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   
   // Check if user is verified with Telegram
   useEffect(() => {
     if (user) {
       setName(user.name || '');
       setPhone(user.phone || '');
+      setEmail(user.email || '');
       
       const isVerified = localStorage.getItem('telegramSubscribed') === 'true';
       setIsTelegramVerified(isVerified);
@@ -70,7 +75,7 @@ const Profile = () => {
     }
     
     if (user) {
-      updateUserInfo(user.id, { name, phone });
+      updateUserInfo(user.id, { name, phone, email });
       setIsEditing(false);
       toast.success('Информация успешно обновлена');
     }
@@ -83,6 +88,8 @@ const Profile = () => {
     }
   };
 
+  const isEmailEdited = user && email !== user.email;
+
   if (!user) {
     return (
       <div className="container mx-auto px-4 py-10">
@@ -92,6 +99,11 @@ const Profile = () => {
         </div>
       </div>
     );
+  }
+
+  // Check if we're on a sub-route of /profile
+  if (location.pathname !== '/profile') {
+    return null; // Let the sub-route components render
   }
 
   return (
@@ -144,16 +156,31 @@ const Profile = () => {
                       </div>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Email</p>
-                      <p className="font-medium">{user.email}</p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        Для изменения email свяжитесь с администратором
-                      </p>
+                      <label className="text-sm text-gray-500 mb-1 block">Email</label>
+                      <div className="flex items-center">
+                        <Mail className="h-4 w-4 mr-2 text-gray-400" />
+                        <Input 
+                          value={email} 
+                          onChange={(e) => setEmail(e.target.value)} 
+                          placeholder="Ваш email" 
+                        />
+                      </div>
+                      {isEmailEdited && (
+                        <p className="text-xs text-amber-600 mt-1">
+                          Для изменения email потребуется подтверждение по коду
+                        </p>
+                      )}
                     </div>
                     <div className="flex space-x-2 pt-2">
                       <Button 
                         variant="default" 
-                        onClick={() => setShowEmailVerification(true)}
+                        onClick={() => {
+                          if (isEmailEdited) {
+                            setShowEmailVerification(true);
+                          } else {
+                            handleSaveChanges();
+                          }
+                        }}
                       >
                         Сохранить
                       </Button>
@@ -163,6 +190,7 @@ const Profile = () => {
                           setIsEditing(false);
                           setName(user.name || '');
                           setPhone(user.phone || '');
+                          setEmail(user.email || '');
                         }}
                       >
                         Отмена
@@ -187,7 +215,10 @@ const Profile = () => {
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Email</p>
-                      <p className="font-medium">{user.email}</p>
+                      <div className="flex items-center">
+                        <Mail className="h-4 w-4 mr-2 text-gray-400" />
+                        <p className="font-medium">{user.email}</p>
+                      </div>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">ID пользователя</p>
@@ -272,7 +303,7 @@ const Profile = () => {
       <EmailVerificationDialog
         isOpen={showEmailVerification}
         onClose={() => setShowEmailVerification(false)}
-        email={user.email}
+        email={email}
         onVerifySuccess={() => handleEmailVerify(true)}
         onVerifyError={() => handleEmailVerify(false)}
       />

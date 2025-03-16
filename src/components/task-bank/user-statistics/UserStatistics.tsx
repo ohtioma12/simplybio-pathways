@@ -44,11 +44,6 @@ const UserStatistics: React.FC<UserStatisticsProps> = ({ userId }) => {
     }
   };
 
-  const handleViewDetails = (testId: string) => {
-    setSelectedTestId(testId);
-    setShowTestDetails(true);
-  };
-
   const getSelectedTest = () => {
     return solvedTests.find(test => test.testId === selectedTestId) || null;
   };
@@ -90,7 +85,10 @@ const UserStatistics: React.FC<UserStatisticsProps> = ({ userId }) => {
           <TestsTable 
             solvedTests={solvedTests}
             onDeleteTest={handleDeleteTest}
-            onViewDetails={handleViewDetails}
+            onViewDetails={(testId) => {
+              setSelectedTestId(testId);
+              setShowTestDetails(true);
+            }}
           />
         </TabsContent>
         
