@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { getUserSolvedTests, SolvedTest, deleteUserTest } from './statistics-service';
-import { ExternalLink, FileText, Trash2, ChevronRight } from 'lucide-react';
+import { ExternalLink, FileText, Trash2, ChevronRight, Check, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';

@@ -16,14 +16,16 @@ interface EmailVerificationDialogProps {
   isOpen: boolean;
   onClose: () => void;
   email: string;
-  onVerificationSuccess: () => void;
+  onVerifySuccess: () => void;
+  onVerifyError?: () => void;
 }
 
 const EmailVerificationDialog: React.FC<EmailVerificationDialogProps> = ({ 
   isOpen, 
   onClose,
   email,
-  onVerificationSuccess
+  onVerifySuccess,
+  onVerifyError
 }) => {
   const [verificationCode, setVerificationCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -69,14 +71,20 @@ const EmailVerificationDialog: React.FC<EmailVerificationDialogProps> = ({
       
       if (verificationCode === correctCode) {
         toast.success('Email успешно подтверждён');
-        onVerificationSuccess();
+        onVerifySuccess();
         onClose();
       } else {
         toast.error('Неверный код подтверждения');
+        if (onVerifyError) {
+          onVerifyError();
+        }
       }
     } catch (error) {
       console.error('Verification error:', error);
       toast.error('Ошибка при проверке кода');
+      if (onVerifyError) {
+        onVerifyError();
+      }
     } finally {
       setIsLoading(false);
     }

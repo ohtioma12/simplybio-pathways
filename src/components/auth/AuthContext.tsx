@@ -11,6 +11,10 @@ export interface User {
   phone?: string;
 }
 
+interface UserWithPassword extends User {
+  password: string;
+}
+
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
@@ -30,8 +34,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Mock user data - in a real app, this would come from a database
-const MOCK_USERS = [
+const MOCK_USERS: UserWithPassword[] = [
   {
     id: '1',
     email: 'admin@prosto.ru',
@@ -82,10 +85,9 @@ const MOCK_USERS = [
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [users, setUsers] = useState(MOCK_USERS);
+  const [users, setUsers] = useState<UserWithPassword[]>(MOCK_USERS);
 
   useEffect(() => {
-    // Check if user is stored in localStorage (persistence)
     const storedUser = localStorage.getItem('prostoUser');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
@@ -97,7 +99,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 500));
       
       const matchedUser = users.find(
@@ -124,16 +125,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     
     try {
-      // Check if email already exists
       if (users.some(u => u.email === email)) {
         toast.error('Пользователь с таким email уже существует');
         setIsLoading(false);
         return;
       }
       
-      // In a real app, this would create a user in the database
-      // For this demo, we'll simulate adding a user to our in-memory array
-      const newUser = {
+      const newUser: UserWithPassword = {
         id: (users.length + 1).toString(),
         email,
         password,
@@ -161,10 +159,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      // Update users array
       const updatedUsers = users.map(u => {
         if (u.id === userId) {
           return { ...u, ...data };
@@ -174,7 +170,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       setUsers(updatedUsers);
       
-      // If the updated user is the current user, update current user state
       if (user && user.id === userId) {
         const updatedUser = { ...user, ...data };
         setUser(updatedUser);
@@ -194,14 +189,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      // Filter out the user with the specified ID
       const updatedUsers = users.filter(user => user.id !== userId);
       setUsers(updatedUsers);
       
-      // If the deleted user is the current user, log them out
       if (user && user.id === userId) {
         logout();
       }
@@ -214,21 +206,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(false);
     }
   };
-  
+
   const resetPassword = async (email: string) => {
     setIsLoading(true);
     
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 500));
       
       const userExists = users.some(user => user.email === email);
       
       if (userExists) {
-        // In a real app, send password reset email
         toast.success('Инструкции по сбросу пароля отправлены на ваш email');
       } else {
-        // We're being deliberately vague here for security reasons
         toast.success('Если учетная запись с этим email существует, инструкции по сбросу пароля будут отправлены');
       }
       
@@ -239,10 +228,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(false);
     }
   };
-  
+
   const verifyEmail = async (email: string, code: string) => {
-    // In a real app, verify the code with an API
-    // For demo purposes, we'll check if code is '123456'
     return code === '123456';
   };
 
