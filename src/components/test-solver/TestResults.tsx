@@ -46,7 +46,6 @@ const TestResults: React.FC<TestResultsProps> = ({ score, answers }) => {
           <div className="space-y-4">
             <p className="text-lg font-medium">
               Вы набрали {totalEarnedPoints} из {totalPossiblePoints} баллов
-              ({Math.round(progressPercentage)}%)
             </p>
             <Progress 
               value={progressPercentage} 
@@ -58,7 +57,7 @@ const TestResults: React.FC<TestResultsProps> = ({ score, answers }) => {
       
       <Card>
         <CardHeader>
-          <CardTitle>Детали ответов</CardTitle>
+          <CardTitle>Детальные результаты</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>

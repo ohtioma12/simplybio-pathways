@@ -12,17 +12,42 @@ const Profile = () => {
   const { user, isAdmin } = useAuth();
   const [showTelegramDialog, setShowTelegramDialog] = useState(false);
   const [isTelegramVerified, setIsTelegramVerified] = useState(false);
+  const [lastVerificationTime, setLastVerificationTime] = useState<number | null>(null);
   
   // Check if user is verified with Telegram
   useEffect(() => {
     if (user) {
       const isVerified = localStorage.getItem('telegramSubscribed') === 'true';
       setIsTelegramVerified(isVerified);
+      
+      const lastChecked = localStorage.getItem('telegramLastChecked');
+      if (lastChecked) {
+        setLastVerificationTime(parseInt(lastChecked, 10));
+      }
+      
+      // If not admin, check Telegram subscription status periodically
+      if (!isAdmin && isVerified) {
+        const now = Date.now();
+        // Only check once every hour (3600000 ms)
+        if (!lastChecked || now - parseInt(lastChecked, 10) > 3600000) {
+          // For demo, we'll just use a random chance of "unsubscribing"
+          // In production, this would be an actual API call to Telegram
+          if (Math.random() < 0.1) { // 10% chance of "unsubscribing" for demo
+            setIsTelegramVerified(false);
+            localStorage.setItem('telegramSubscribed', 'false');
+          }
+          localStorage.setItem('telegramLastChecked', now.toString());
+          setLastVerificationTime(now);
+        }
+      }
     }
-  }, [user]);
+  }, [user, isAdmin]);
   
   const handleVerifySuccess = () => {
     setIsTelegramVerified(true);
+    const now = Date.now();
+    localStorage.setItem('telegramLastChecked', now.toString());
+    setLastVerificationTime(now);
   };
 
   if (!user) {
@@ -71,12 +96,19 @@ const Profile = () => {
                     <p className="text-sm font-medium mb-2">Статус подписки на Telegram</p>
                     
                     {isTelegramVerified ? (
-                      <Alert className="bg-green-50 border-green-200">
-                        <Check className="h-4 w-4 text-green-600" />
-                        <AlertDescription className="text-green-600">
-                          Вы подписаны на канал Pro100 Bio
-                        </AlertDescription>
-                      </Alert>
+                      <>
+                        <Alert className="bg-green-50 border-green-200">
+                          <Check className="h-4 w-4 text-green-600" />
+                          <AlertDescription className="text-green-600">
+                            Вы подписаны на канал Pro100 Bio
+                          </AlertDescription>
+                        </Alert>
+                        {lastVerificationTime && (
+                          <p className="text-xs text-muted-foreground mt-2">
+                            Последняя проверка: {new Date(lastVerificationTime).toLocaleString()}
+                          </p>
+                        )}
+                      </>
                     ) : (
                       <>
                         <Alert className="bg-amber-50 border-amber-200 mb-3">

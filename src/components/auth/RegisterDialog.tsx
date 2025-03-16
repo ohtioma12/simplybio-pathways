@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from './AuthContext';
+import EmailVerificationDialog from './EmailVerificationDialog';
 
 interface RegisterDialogProps {
   isOpen: boolean;
@@ -30,6 +31,8 @@ const RegisterDialog: React.FC<RegisterDialogProps> = ({
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const { register, isLoading } = useAuth();
+  const [showVerification, setShowVerification] = useState(false);
+  const [registrationComplete, setRegistrationComplete] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,90 +45,110 @@ const RegisterDialog: React.FC<RegisterDialogProps> = ({
     
     try {
       await register(email, password, name);
-      onClose();
-      showLogin();
+      setShowVerification(true);
     } catch (error) {
       console.error('Registration error:', error);
     }
   };
 
+  const handleVerificationSuccess = () => {
+    setShowVerification(false);
+    setRegistrationComplete(true);
+  };
+
+  const handleClose = () => {
+    if (registrationComplete) {
+      showLogin();
+    }
+    onClose();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Регистрация</DialogTitle>
-          <DialogDescription>
-            Создайте аккаунт для доступа к банку заданий
-          </DialogDescription>
-        </DialogHeader>
-        
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Имя</Label>
-            <Input
-              id="name"
-              placeholder="Иван Иванов"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </div>
+    <>
+      <Dialog open={isOpen} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Регистрация</DialogTitle>
+            <DialogDescription>
+              Создайте аккаунт для доступа к банку заданий
+            </DialogDescription>
+          </DialogHeader>
           
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="example@prosto.ru"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="password">Пароль</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Подтвердите пароль</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
-            {passwordError && (
-              <p className="text-sm text-destructive">{passwordError}</p>
-            )}
-          </div>
-          
-          <DialogFooter className="pt-4">
-            <div className="w-full flex flex-col space-y-2">
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Загрузка...' : 'Зарегистрироваться'}
-              </Button>
-              <Button 
-                type="button" 
-                variant="outline" 
-                className="w-full"
-                onClick={showLogin}
-              >
-                Уже есть аккаунт? Войти
-              </Button>
+          <form onSubmit={handleSubmit} className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Имя</Label>
+              <Input
+                id="name"
+                placeholder="Иван Иванов"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
             </div>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+            
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="example@prosto.ru"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password">Пароль</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Подтвердите пароль</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+              {passwordError && (
+                <p className="text-sm text-destructive">{passwordError}</p>
+              )}
+            </div>
+            
+            <DialogFooter className="pt-4">
+              <div className="w-full flex flex-col space-y-2">
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? 'Загрузка...' : 'Зарегистрироваться'}
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={showLogin}
+                >
+                  Уже есть аккаунт? Войти
+                </Button>
+              </div>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <EmailVerificationDialog
+        isOpen={showVerification}
+        onClose={() => setShowVerification(false)}
+        email={email}
+        onVerificationSuccess={handleVerificationSuccess}
+      />
+    </>
   );
 };
 

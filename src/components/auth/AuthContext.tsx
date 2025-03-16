@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
@@ -21,6 +22,9 @@ interface AuthContextType {
   isTeacher: boolean;
   isStudent: boolean;
   isTelegramVerified: boolean;
+  deleteUser: (userId: string) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  verifyEmail: (email: string, code: string) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -75,6 +79,7 @@ const MOCK_USERS = [
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [users, setUsers] = useState(MOCK_USERS);
 
   useEffect(() => {
     // Check if user is stored in localStorage (persistence)
@@ -92,7 +97,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      const matchedUser = MOCK_USERS.find(
+      const matchedUser = users.find(
         u => u.email === email && u.password === password
       );
       
@@ -117,15 +122,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     try {
       // Check if email already exists
-      if (MOCK_USERS.some(u => u.email === email)) {
+      if (users.some(u => u.email === email)) {
         toast.error('Пользователь с таким email уже существует');
         setIsLoading(false);
         return;
       }
       
       // In a real app, this would create a user in the database
-      // For this demo, we'll just simulate success
-      toast.success('Регистрация успешна! Теперь вы можете войти.');
+      // For this demo, we'll simulate adding a user to our in-memory array
+      const newUser = {
+        id: (users.length + 1).toString(),
+        email,
+        password,
+        name,
+        role
+      };
+      
+      setUsers([...users, newUser]);
+      toast.success('Регистрация успешна! Теперь вы можете войти после подтверждения email.');
     } catch (error) {
       toast.error('Ошибка при регистрации');
       console.error(error);
@@ -138,6 +152,62 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
     localStorage.removeItem('prostoUser');
     toast.info('Вы вышли из системы');
+  };
+
+  const deleteUser = async (userId: string) => {
+    setIsLoading(true);
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Filter out the user with the specified ID
+      const updatedUsers = users.filter(user => user.id !== userId);
+      setUsers(updatedUsers);
+      
+      // If the deleted user is the current user, log them out
+      if (user && user.id === userId) {
+        logout();
+      }
+      
+      toast.success('Пользователь успешно удален');
+    } catch (error) {
+      toast.error('Ошибка при удалении пользователя');
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const resetPassword = async (email: string) => {
+    setIsLoading(true);
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const userExists = users.some(user => user.email === email);
+      
+      if (userExists) {
+        // In a real app, send password reset email
+        toast.success('Инструкции по сбросу пароля отправлены на ваш email');
+      } else {
+        // We're being deliberately vague here for security reasons
+        toast.success('Если учетная запись с этим email существует, инструкции по сбросу пароля будут отправлены');
+      }
+      
+    } catch (error) {
+      toast.error('Ошибка при отправке инструкций по сбросу пароля');
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const verifyEmail = async (email: string, code: string) => {
+    // In a real app, verify the code with an API
+    // For demo purposes, we'll just return true
+    return true;
   };
 
   const isTelegramVerified = localStorage.getItem('telegramSubscribed') === 'true';
@@ -155,6 +225,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isTeacher: user?.role === 'teacher',
         isStudent: user?.role === 'student',
         isTelegramVerified,
+        deleteUser,
+        resetPassword,
+        verifyEmail,
       }}
     >
       {children}

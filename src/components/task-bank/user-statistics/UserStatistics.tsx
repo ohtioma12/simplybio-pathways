@@ -89,7 +89,7 @@ const UserStatistics: React.FC<UserStatisticsProps> = ({ userId }) => {
             <CardTitle className="text-sm font-medium">Средний результат</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{overallPercentage}%</div>
+            <div className="text-2xl font-bold">{totalPoints} из {totalPossiblePoints}</div>
             <Progress value={overallPercentage} className="h-2 mt-2" />
           </CardContent>
         </Card>
@@ -134,7 +134,7 @@ const UserStatistics: React.FC<UserStatisticsProps> = ({ userId }) => {
                     <TableCell>
                       <Link to={`/test-solver/${test.testId}`}>
                         <Button size="sm" variant="outline" className="flex items-center gap-1">
-                          <ExternalLink className="h-3 w-3" />
+                          <FileText className="h-3 w-3" />
                           Просмотр решения
                         </Button>
                       </Link>
