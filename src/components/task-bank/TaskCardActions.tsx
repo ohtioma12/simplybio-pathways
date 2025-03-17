@@ -7,8 +7,8 @@ import { usePermissions } from '@/hooks/use-permissions';
 
 interface TaskCardActionsProps {
   task: Task;
-  onEditClick: () => void;
-  onDeleteClick: () => void;
+  onEditClick: (e: React.MouseEvent) => void;
+  onDeleteClick: (e: React.MouseEvent) => void;
   hasDeletePermission: boolean;
 }
 

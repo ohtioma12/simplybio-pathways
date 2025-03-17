@@ -140,11 +140,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
             <span className="text-sm text-muted-foreground">{task.topic}</span>
             <TaskCardActions 
               task={task}
-              onEditClick={(e) => {
+              onEditClick={(e: React.MouseEvent) => {
                 e.stopPropagation();
                 setShowEditDialog(true);
               }}
-              onDeleteClick={(e) => {
+              onDeleteClick={(e: React.MouseEvent) => {
                 e.stopPropagation();
                 setShowDeleteDialog(true);
               }}
