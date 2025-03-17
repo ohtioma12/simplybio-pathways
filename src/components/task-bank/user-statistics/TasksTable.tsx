@@ -43,7 +43,11 @@ const TasksTable: React.FC<TasksTableProps> = ({ taskStatistics }) => {
                   {task.taskCode}
                 </Link>
               </TableCell>
-              <TableCell>{task.taskTitle}</TableCell>
+              <TableCell>
+                <Link to={`/task/${task.taskId}`} className="hover:underline">
+                  {task.taskTitle}
+                </Link>
+              </TableCell>
               <TableCell>{task.attempts}</TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">

@@ -25,7 +25,7 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({ children }) => {
 
   // Check if we're on a sub-route of /profile
   if (location.pathname !== '/profile') {
-    return null; // Let the sub-route components render
+    return children; // Let the sub-route components render
   }
 
   return (

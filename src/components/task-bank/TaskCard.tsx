@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Card,
   CardContent,
@@ -15,7 +15,6 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import TaskEditDialog from './TaskEditDialog';
 import TaskDeleteDialog from './TaskDeleteDialog';
-import TaskDetailsDialog from './TaskDetailsDialog';
 import TaskCardActions from './TaskCardActions';
 
 export interface Task {
@@ -48,9 +47,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
   onTaskUpdate,
   onTaskDelete 
 }) => {
+  const navigate = useNavigate();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [showTaskDialog, setShowTaskDialog] = useState(false);
   const [taskCode, setTaskCode] = useState<string>("");
 
   // Generate task code if it doesn't exist
@@ -79,6 +78,10 @@ const TaskCard: React.FC<TaskCardProps> = ({
     }
   };
 
+  const navigateToTask = () => {
+    navigate(`/task/${task.id}`);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -88,7 +91,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
     >
       <Card 
         className="h-full hover-lift cursor-pointer shadow-md hover:shadow-lg transition-all" 
-        onClick={() => setShowTaskDialog(true)}
+        onClick={navigateToTask}
       >
         <CardHeader className="pb-4">
           <div className="flex justify-between items-start">
@@ -137,20 +140,19 @@ const TaskCard: React.FC<TaskCardProps> = ({
             <span className="text-sm text-muted-foreground">{task.topic}</span>
             <TaskCardActions 
               task={task}
-              onEditClick={() => setShowEditDialog(true)}
-              onDeleteClick={() => setShowDeleteDialog(true)}
+              onEditClick={(e) => {
+                e.stopPropagation();
+                setShowEditDialog(true);
+              }}
+              onDeleteClick={(e) => {
+                e.stopPropagation();
+                setShowDeleteDialog(true);
+              }}
               hasDeletePermission={!!onTaskDelete}
             />
           </div>
         </CardFooter>
       </Card>
-
-      {/* Task Details Dialog */}
-      <TaskDetailsDialog
-        task={{...task, taskCode}}
-        isOpen={showTaskDialog}
-        onClose={() => setShowTaskDialog(false)}
-      />
 
       {/* Task Edit Dialog */}
       <TaskEditDialog

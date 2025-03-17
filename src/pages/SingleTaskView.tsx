@@ -17,6 +17,7 @@ const SingleTaskView = () => {
   const [userAnswer, setUserAnswer] = useState('');
   const [isAnswerChecked, setIsAnswerChecked] = useState(false);
   const [isAnswerCorrect, setIsAnswerCorrect] = useState(false);
+  const [showExplanation, setShowExplanation] = useState(false);
   
   useEffect(() => {
     if (!taskId) {
@@ -39,6 +40,7 @@ const SingleTaskView = () => {
   const handleAnswerChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setUserAnswer(e.target.value);
     setIsAnswerChecked(false);
+    setShowExplanation(false);
   };
 
   const checkAnswer = () => {
@@ -47,13 +49,16 @@ const SingleTaskView = () => {
       return;
     }
 
-    if (!task?.correctAnswers) {
+    if (!task?.correctAnswers && !task?.correctAnswer) {
       toast.error('Ошибка: для данного задания не указаны правильные ответы');
       return;
     }
 
     // Check if answer is correct using the array of correct answers
-    const isCorrect = task.correctAnswers.some(
+    const correctAnswersArray = task.correctAnswers || 
+      (task.correctAnswer ? [task.correctAnswer] : []);
+    
+    const isCorrect = correctAnswersArray.some(
       answer => userAnswer.trim().toLowerCase() === answer.toLowerCase()
     ) || false;
     
@@ -66,6 +71,10 @@ const SingleTaskView = () => {
       toast.error('Неправильный ответ. Попробуйте еще раз.');
     }
   };
+
+  const toggleExplanation = () => {
+    setShowExplanation(!showExplanation);
+  };
   
   if (loading) {
     return <div className="container mx-auto px-4 py-8 text-center">Загрузка задания...</div>;
@@ -74,6 +83,10 @@ const SingleTaskView = () => {
   if (!task) {
     return <div className="container mx-auto px-4 py-8 text-center">Задание не найдено</div>;
   }
+
+  // Create corrected array of answers using either correctAnswers or correctAnswer
+  const correctAnswersArray = task.correctAnswers || 
+    (task.correctAnswer ? [task.correctAnswer] : []);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -156,16 +169,28 @@ const SingleTaskView = () => {
                 </div>
               )}
               
+              {/* Explanation toggle button */}
+              {(isAnswerChecked || showExplanation) && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={toggleExplanation} 
+                  className="w-full mb-3"
+                >
+                  {showExplanation ? 'Скрыть объяснение' : 'Показать объяснение'}
+                </Button>
+              )}
+              
               {/* Correct answer section */}
-              {isAnswerChecked && !isAnswerCorrect && task.correctAnswers && (
+              {showExplanation && correctAnswersArray.length > 0 && (
                 <div className="p-3 rounded-md mb-3 bg-blue-50">
                   <h5 className="text-sm font-medium text-blue-700 mb-1">Правильный ответ:</h5>
-                  <p className="text-sm text-blue-800">{task.correctAnswers[0]}</p>
+                  <p className="text-sm text-blue-800">{correctAnswersArray[0]}</p>
                 </div>
               )}
               
               {/* Explanation section */}
-              {isAnswerChecked && task.explanation && (
+              {showExplanation && task.explanation && (
                 <div className="p-3 rounded-md mb-3 bg-purple-50">
                   <h5 className="text-sm font-medium text-purple-700 mb-1">Объяснение:</h5>
                   <p className="text-sm text-purple-800">{task.explanation}</p>
@@ -179,6 +204,7 @@ const SingleTaskView = () => {
                   onClick={() => {
                     setUserAnswer('');
                     setIsAnswerChecked(false);
+                    setShowExplanation(false);
                   }}
                 >
                   Очистить
