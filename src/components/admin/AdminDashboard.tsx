@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { getUserSolvedTests } from '@/components/task-bank/user-statistics/statistics-service';
+import { getUserSolvedTests } from '@/components/task-bank/user-statistics/services';
 import { getUserTests } from '@/components/task-bank/test-generator/pdfGenerator';
 import { sampleTasks } from '@/components/task-bank/data';
 import { Button } from '@/components/ui/button';
