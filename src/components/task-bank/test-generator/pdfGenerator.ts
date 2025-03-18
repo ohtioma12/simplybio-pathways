@@ -24,6 +24,11 @@ export const generateTestPdf = (
     doc.setFontSize(16);
     doc.text(testName, 105, 15, { align: 'center' });
     
+    // Add variant information
+    doc.setFontSize(11);
+    doc.text(`Вариант для тренировки`, 105, 22, { align: 'center' });
+    doc.text(`Сгенерировано: ${new Date().toLocaleDateString('ru-RU')}`, 105, 28, { align: 'center' });
+    
     // Create task list table
     const tableData = selectedTasks.map((task, index) => [
       (index + 1).toString(), // Task number in sequence
@@ -36,11 +41,20 @@ export const generateTestPdf = (
     doc.autoTable({
       head: [['№', 'Код', 'Линия', 'Название задания']],
       body: tableData,
-      startY: 25,
+      startY: 35,
       headStyles: { fillColor: [41, 128, 185] },
       alternateRowStyles: { fillColor: [240, 240, 240] },
-      margin: { top: 25 }
+      margin: { top: 35 }
     });
+    
+    // Add access information
+    const yPosition = doc.lastAutoTable.finalY + 10;
+    doc.setFontSize(10);
+    doc.text("Для решения заданий онлайн перейдите по ссылке:", 14, yPosition);
+    doc.setTextColor(0, 0, 255);
+    doc.text(`${window.location.origin}/test-solver/`, 14, yPosition + 6);
+    doc.setTextColor(0, 0, 0);
+    doc.text("Введите код задания для доступа к каждому заданию.", 14, yPosition + 12);
     
     // If requested, add explanations
     if (options.includeExplanations) {
@@ -82,7 +96,7 @@ export const generateTestPdf = (
         return [
           (index + 1).toString(),
           task.taskCode,
-          taskDetails?.correctAnswers?.[0] || 'Н/Д'
+          taskDetails?.correctAnswers?.[0] || taskDetails?.correctAnswer || 'Н/Д'
         ];
       });
       

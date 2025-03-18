@@ -92,6 +92,47 @@ const TestGeneratorDialog: React.FC<TestGeneratorDialogProps> = ({ tasks }) => {
         </DialogDescription>
       </DialogHeader>
       
+      <div className="mb-4 flex flex-wrap justify-between items-center gap-2">
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="include-explanations"
+              checked={pdfOptions.includeExplanations}
+              onCheckedChange={(checked) => 
+                setPdfOptions(prev => ({ ...prev, includeExplanations: !!checked }))
+              }
+            />
+            <label 
+              htmlFor="include-explanations" 
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Добавить пояснения к заданиям в PDF
+            </label>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="include-answer-key"
+              checked={pdfOptions.includeAnswerKey}
+              onCheckedChange={(checked) => 
+                setPdfOptions(prev => ({ ...prev, includeAnswerKey: !!checked }))
+              }
+            />
+            <label 
+              htmlFor="include-answer-key" 
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Добавить ключи с ответами в PDF
+            </label>
+          </div>
+        </div>
+        
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleGeneratePDF}>Скачать PDF</Button>
+          <Button onClick={handleGenerateTest}>Создать вариант</Button>
+        </div>
+      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <TestSettingsForm
           testName={testName}
@@ -134,47 +175,6 @@ const TestGeneratorDialog: React.FC<TestGeneratorDialogProps> = ({ tasks }) => {
           </div>
         </div>
       )}
-      
-      <div className="mt-4 space-y-2">
-        <div className="flex items-center space-x-2">
-          <Checkbox 
-            id="include-explanations"
-            checked={pdfOptions.includeExplanations}
-            onCheckedChange={(checked) => 
-              setPdfOptions(prev => ({ ...prev, includeExplanations: !!checked }))
-            }
-          />
-          <label 
-            htmlFor="include-explanations" 
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
-            Добавить пояснения к заданиям в PDF
-          </label>
-        </div>
-        
-        <div className="flex items-center space-x-2">
-          <Checkbox 
-            id="include-answer-key"
-            checked={pdfOptions.includeAnswerKey}
-            onCheckedChange={(checked) => 
-              setPdfOptions(prev => ({ ...prev, includeAnswerKey: !!checked }))
-            }
-          />
-          <label 
-            htmlFor="include-answer-key" 
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
-            Добавить ключи с ответами в PDF
-          </label>
-        </div>
-      </div>
-      
-      <DialogFooter className="mt-6 flex justify-end">
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={handleGeneratePDF}>Скачать PDF</Button>
-          <Button onClick={handleGenerateTest}>Создать вариант</Button>
-        </div>
-      </DialogFooter>
     </DialogContent>
   );
 };

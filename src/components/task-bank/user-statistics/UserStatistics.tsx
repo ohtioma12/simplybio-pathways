@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   getUserSolvedTests, 
@@ -15,7 +16,6 @@ import TasksTable from './TasksTable';
 import TestDetailsDialog from './TestDetailsDialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 interface UserStatisticsProps {
   userId: string;
@@ -60,6 +60,9 @@ const UserStatistics: React.FC<UserStatisticsProps> = ({ userId }) => {
     if (test) {
       setSelectedTest(test);
       setShowDetailsDialog(true);
+    } else {
+      // Fallback to redirect to the test statistics page directly
+      navigate(`/test-statistics/${testId}`);
     }
   };
   

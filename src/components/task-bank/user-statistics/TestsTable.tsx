@@ -61,14 +61,13 @@ const TestsTable: React.FC<TestsTableProps> = ({
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Link to={`/test-statistics/${test.testId}`}>
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                      >
-                        Просмотр решения
-                      </Button>
-                    </Link>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => onViewDetails(test.testId)}
+                    >
+                      Просмотр решения
+                    </Button>
                     
                     <Button 
                       size="sm"

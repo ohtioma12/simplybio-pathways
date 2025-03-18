@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, BarChart } from 'lucide-react';
@@ -15,7 +16,6 @@ import { sampleTasks } from './data';
 import { toast } from 'sonner';
 
 // Import components
-import PdfOptionsSection from './my-tests/PdfOptionsSection';
 import TestsTable from './my-tests/TestsTable';
 import ShareTestDialog from './my-tests/ShareTestDialog';
 import UserStatistics from './user-statistics/UserStatistics';
@@ -83,8 +83,8 @@ const MyTestsButton: React.FC = () => {
       
       return {
         id: taskDetails.id,
-        title: taskDetails.title,
         taskCode: generatedTaskCode,
+        title: taskDetails.title,
         line: taskDetails.line || 'N/A',
         selected: true
       };
@@ -121,11 +121,6 @@ const MyTestsButton: React.FC = () => {
           </DialogHeader>
           
           <div className="space-y-2 mb-4 flex justify-between items-center">
-            <PdfOptionsSection 
-              pdfOptions={pdfOptions} 
-              setPdfOptions={setPdfOptions} 
-            />
-            
             <Button 
               variant="outline" 
               onClick={() => setShowStatisticsDialog(true)}
