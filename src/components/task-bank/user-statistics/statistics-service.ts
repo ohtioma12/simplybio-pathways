@@ -1,4 +1,3 @@
-
 import { sampleTasks } from '../data';
 import { UserAnswer as TypesUserAnswer } from '../test-generator/types';
 
@@ -24,6 +23,16 @@ export interface SolvedTest {
     correct: number;
     total: number;
   };
+}
+
+// Add this interface for task statistics
+export interface TaskStatistic {
+  taskId: number;
+  taskCode: string;
+  title: string;
+  attempts: number;
+  correctAttempts: number;
+  lastAttemptDate: string;
 }
 
 // Helper function to convert between UserAnswer formats
@@ -109,6 +118,59 @@ export const getUserSolvedTests = (userId?: string): SolvedTest[] => {
     );
   } catch (error) {
     console.error('Error fetching user solved tests:', error);
+    return [];
+  }
+};
+
+export const getUserTaskStatistics = (userId?: string): TaskStatistic[] => {
+  try {
+    // Get all solved tests for the user
+    const userSolvedTests = getUserSolvedTests(userId);
+    
+    // Create a map to track statistics for each task
+    const taskStatsMap = new Map<number, TaskStatistic>();
+    
+    // Process each test's answers to build task statistics
+    userSolvedTests.forEach(test => {
+      test.answers.forEach(answer => {
+        const taskId = answer.taskId;
+        const task = getTaskDetails(taskId);
+        
+        if (!task) return;
+        
+        const taskCode = answer.taskCode || task.taskCode || '';
+        
+        if (!taskStatsMap.has(taskId)) {
+          // Initialize task stats if this is the first encounter
+          taskStatsMap.set(taskId, {
+            taskId,
+            taskCode,
+            title: task.title || '',
+            attempts: 1,
+            correctAttempts: answer.isCorrect ? 1 : 0,
+            lastAttemptDate: test.completedAt
+          });
+        } else {
+          // Update existing stats
+          const existingStats = taskStatsMap.get(taskId)!;
+          taskStatsMap.set(taskId, {
+            ...existingStats,
+            attempts: existingStats.attempts + 1,
+            correctAttempts: existingStats.correctAttempts + (answer.isCorrect ? 1 : 0),
+            lastAttemptDate: new Date(test.completedAt) > new Date(existingStats.lastAttemptDate) 
+              ? test.completedAt 
+              : existingStats.lastAttemptDate
+          });
+        }
+      });
+    });
+    
+    // Convert map to array and sort by last attempt date (newest first)
+    return Array.from(taskStatsMap.values())
+      .sort((a, b) => new Date(b.lastAttemptDate).getTime() - new Date(a.lastAttemptDate).getTime());
+    
+  } catch (error) {
+    console.error('Error generating task statistics:', error);
     return [];
   }
 };

@@ -2,26 +2,34 @@
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getUserSolvedTests, getUserTaskStatistics, SolvedTest } from './statistics-service';
+import { 
+  getUserSolvedTests, 
+  getUserTaskStatistics, 
+  SolvedTest, 
+  deleteUserTest, 
+  TaskStatistic 
+} from './statistics-service';
 import StatisticsCards from './StatisticsCards';
 import TestsTable from './TestsTable';
 import TasksTable from './TasksTable';
 import TestDetailsDialog from './TestDetailsDialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface UserStatisticsProps {
   userId: string;
 }
 
 const UserStatistics: React.FC<UserStatisticsProps> = ({ userId }) => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('tests');
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [selectedTest, setSelectedTest] = useState<SolvedTest | null>(null);
   
   // Get the statistics data from the service
   const solvedTests = getUserSolvedTests(userId);
-  const taskStatistics = getUserTaskStatistics(userId);
+  const taskStatistics: TaskStatistic[] = getUserTaskStatistics(userId);
   
   // Calculate the overall statistics
   const totalTests = solvedTests.length;
@@ -40,8 +48,11 @@ const UserStatistics: React.FC<UserStatisticsProps> = ({ userId }) => {
     : 0;
   
   const handleDeleteTest = (testId: string) => {
-    // In a real app, this would call an API to delete the test
-    toast.success('Вариант удален из истории');
+    if (deleteUserTest(testId, userId)) {
+      toast.success('Вариант удален из истории');
+    } else {
+      toast.error('Ошибка при удалении варианта');
+    }
   };
   
   const handleViewTestDetails = (testId: string) => {
@@ -69,6 +80,7 @@ const UserStatistics: React.FC<UserStatisticsProps> = ({ userId }) => {
         totalTests={totalTests}
         totalAttemptedTasks={totalAttemptedTasks}
         averageScore={averageScore}
+        userId={userId}
       />
       
       <Tabs defaultValue="tests" onValueChange={setActiveTab}>
