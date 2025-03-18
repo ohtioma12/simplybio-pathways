@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
@@ -19,7 +18,7 @@ import {
   DialogDescription
 } from '@/components/ui/dialog';
 import { Link } from 'react-router-dom';
-import { SolvedTest } from './statistics-service';
+import { SolvedTest } from './services';
 
 interface TestDetailsDialogProps {
   open: boolean;

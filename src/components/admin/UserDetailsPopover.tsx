@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserCog, FileText, BarChart2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { getUserSolvedTests } from '@/components/task-bank/user-statistics/statistics-service';
+import { getUserSolvedTests } from '@/components/task-bank/user-statistics/services';
 import {
   AlertDialog,
   AlertDialogAction,

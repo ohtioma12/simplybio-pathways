@@ -4,11 +4,11 @@ import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   getUserSolvedTests, 
-  getUserTaskStatistics, 
+  getUserTaskStatistics,
   SolvedTest, 
-  deleteUserTest, 
+  deleteUserTest,
   TaskStatistic 
-} from './statistics-service';
+} from './services';
 import StatisticsCards from './StatisticsCards';
 import TestsTable from './TestsTable';
 import TasksTable from './TasksTable';

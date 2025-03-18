@@ -11,7 +11,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Link } from 'react-router-dom';
-import { TaskStatistic } from './statistics-service';
+import { TaskStatistic } from './services';
 
 interface TasksTableProps {
   taskStatistics: TaskStatistic[];
