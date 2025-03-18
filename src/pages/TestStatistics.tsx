@@ -18,7 +18,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuth } from '@/components/auth/AuthContext';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { getUserSolvedTests, SolvedTest } from '@/components/task-bank/user-statistics/statistics-service';
+import { getUserSolvedTests, SolvedTest } from '@/components/task-bank/user-statistics/services';
 import { toast } from 'sonner';
 
 const TestStatistics = () => {

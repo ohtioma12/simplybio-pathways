@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   saveTestResults, 
   convertUserAnswer 
-} from '@/components/task-bank/user-statistics/statistics-service';
+} from '@/components/task-bank/user-statistics/services';
 import { useAuth } from '@/components/auth/AuthContext';
 
 export const useTestSolver = (testId: string | undefined) => {

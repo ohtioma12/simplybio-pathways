@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { SolvedTest } from './statistics-service';
+import { SolvedTest } from './services';
 
 interface TestsTableProps {
   solvedTests: SolvedTest[];
