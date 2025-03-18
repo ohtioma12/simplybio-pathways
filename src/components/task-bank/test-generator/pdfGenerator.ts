@@ -5,6 +5,16 @@ import { TaskOption, TestGenerationOptions, SavedTest } from './types';
 import { toast } from 'sonner';
 import { Task } from '../TaskCard';
 
+// Add type augmentation for jsPDF with autotable
+declare module 'jspdf' {
+  interface jsPDF {
+    lastAutoTable: {
+      finalY: number;
+    } | undefined;
+    autoTable: (options: any) => void;
+  }
+}
+
 export const generateTestPdf = (
   testName: string,
   selectedTasks: TaskOption[],
@@ -37,7 +47,7 @@ export const generateTestPdf = (
       task.title // Task title
     ]);
     
-    // @ts-ignore - jsPDF autotable method
+    // Using autotable method
     doc.autoTable({
       head: [['№', 'Код', 'Линия', 'Название задания']],
       body: tableData,
@@ -48,7 +58,7 @@ export const generateTestPdf = (
     });
     
     // Add access information
-    const yPosition = doc.lastAutoTable.finalY + 10;
+    const yPosition = doc.lastAutoTable?.finalY + 10 || 100;
     doc.setFontSize(10);
     doc.text("Для решения заданий онлайн перейдите по ссылке:", 14, yPosition);
     doc.setTextColor(0, 0, 255);
@@ -100,7 +110,7 @@ export const generateTestPdf = (
         ];
       });
       
-      // @ts-ignore - jsPDF autotable method
+      // Using autotable method
       doc.autoTable({
         head: [['№', 'Код задания', 'Ответ']],
         body: answerKeyData,
