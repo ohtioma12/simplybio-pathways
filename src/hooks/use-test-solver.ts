@@ -84,10 +84,11 @@ export const useTestSolver = (testId: string | undefined) => {
   };
   
   const checkAllAnswers = () => {
-    if (userAnswers.some(a => !a.answer?.trim())) {
-      toast.error('Пожалуйста, ответьте на все вопросы перед проверкой');
-      return;
-    }
+    // Remove the validation that required all questions to be answered
+    // if (userAnswers.some(a => !a.answer?.trim())) {
+    //   toast.error('Пожалуйста, ответьте на все вопросы перед проверкой');
+    //   return;
+    // }
     
     let correctCount = 0;
     const checkedAnswers = userAnswers.map(userAnswer => {
@@ -100,8 +101,10 @@ export const useTestSolver = (testId: string | undefined) => {
       
       if (correctAnswersArray.length === 0) return userAnswer;
       
-      const isCorrect = correctAnswersArray.some(
-        answer => userAnswer.answer?.trim().toLowerCase() === answer.toLowerCase()
+      // For empty or whitespace-only answers, mark as incorrect
+      const userAnswerText = userAnswer.answer?.trim() || '';
+      const isCorrect = userAnswerText !== '' && correctAnswersArray.some(
+        answer => userAnswerText.toLowerCase() === answer.toLowerCase()
       );
       
       if (isCorrect) correctCount++;
@@ -109,11 +112,11 @@ export const useTestSolver = (testId: string | undefined) => {
       // Ensure we return an object that satisfies the UserAnswer interface
       return {
         taskId: userAnswer.taskId,
-        answer: userAnswer.answer, // Make sure this is always present
-        isCorrect,
+        answer: userAnswer.answer || '', // Make sure this is always present (empty string if not answered)
+        isCorrect: userAnswerText !== '' ? isCorrect : false, // Explicitly false for empty answers
         taskCode: taskOption?.taskCode,
         taskTitle: task.title,
-        userAnswer: userAnswer.answer,
+        userAnswer: userAnswer.answer || '',
         correctAnswer: correctAnswersArray.join(' или '),
         points: isCorrect ? ((task as any).points || 1) : 0,
         maxPoints: (task as any).points || 1 

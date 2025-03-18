@@ -40,7 +40,6 @@ const SingleTaskView = () => {
   const handleAnswerChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setUserAnswer(e.target.value);
     setIsAnswerChecked(false);
-    setShowExplanation(false);
   };
 
   const checkAnswer = () => {
@@ -67,6 +66,7 @@ const SingleTaskView = () => {
     
     if (isCorrect) {
       toast.success('Правильный ответ!');
+      setShowExplanation(true); // Automatically show explanation on correct answer
     } else {
       toast.error('Неправильный ответ. Попробуйте еще раз.');
     }
@@ -169,17 +169,15 @@ const SingleTaskView = () => {
                 </div>
               )}
               
-              {/* Explanation toggle button */}
-              {(isAnswerChecked || showExplanation) && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={toggleExplanation} 
-                  className="w-full mb-3"
-                >
-                  {showExplanation ? 'Скрыть объяснение' : 'Показать объяснение'}
-                </Button>
-              )}
+              {/* Explanation button is always available (even before solving) */}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={toggleExplanation} 
+                className="w-full mb-3"
+              >
+                {showExplanation ? 'Скрыть объяснение' : 'Показать объяснение'}
+              </Button>
               
               {/* Correct answer section */}
               {showExplanation && correctAnswersArray.length > 0 && (
@@ -204,7 +202,6 @@ const SingleTaskView = () => {
                   onClick={() => {
                     setUserAnswer('');
                     setIsAnswerChecked(false);
-                    setShowExplanation(false);
                   }}
                 >
                   Очистить

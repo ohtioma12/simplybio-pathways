@@ -18,6 +18,7 @@ import {
   DialogTitle,
   DialogDescription
 } from '@/components/ui/dialog';
+import { Link } from 'react-router-dom';
 import { SolvedTest } from './statistics-service';
 
 interface TestDetailsDialogProps {
@@ -59,7 +60,13 @@ const TestDetailsDialog: React.FC<TestDetailsDialogProps> = ({
               <TableRow key={`${answer.taskId}-${index}`}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>
-                  <div className="font-medium">{answer.taskCode || `Задание ${answer.taskId}`}</div>
+                  <Link 
+                    to={`/task/${answer.taskId}`} 
+                    className="font-medium text-blue-600 hover:underline"
+                    onClick={() => onOpenChange(false)}
+                  >
+                    {answer.taskCode || `Задание ${answer.taskId}`}
+                  </Link>
                 </TableCell>
                 <TableCell>{answer.answer || '-'}</TableCell>
                 <TableCell>{answer.correctAnswer || '-'}</TableCell>

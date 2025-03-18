@@ -3,7 +3,7 @@ import React from 'react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
-import { FileText, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -61,14 +61,11 @@ const TestsTable: React.FC<TestsTableProps> = ({
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Link to={`/test-solver/${test.testId}`}>
+                    <Link to={`/test-statistics/${test.testId}`}>
                       <Button 
                         size="sm" 
-                        variant="outline" 
-                        className="flex items-center gap-1"
-                        onClick={() => onViewDetails(test.testId)}
+                        variant="outline"
                       >
-                        <FileText className="h-3 w-3" />
                         Просмотр решения
                       </Button>
                     </Link>

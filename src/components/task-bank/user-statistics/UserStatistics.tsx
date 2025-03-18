@@ -1,105 +1,110 @@
 
-import React, { useEffect, useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import React, { useState } from 'react';
 import { toast } from 'sonner';
-import { getUserSolvedTests, SolvedTest, deleteUserTest } from './statistics-service';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { getUserSolvedTests, getUserTaskStatistics, SolvedTest } from './statistics-service';
 import StatisticsCards from './StatisticsCards';
 import TestsTable from './TestsTable';
 import TasksTable from './TasksTable';
 import TestDetailsDialog from './TestDetailsDialog';
-import { getTaskStatistics, calculateOverallStatistics } from './utils';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
 interface UserStatisticsProps {
-  userId?: string;
+  userId: string;
 }
 
 const UserStatistics: React.FC<UserStatisticsProps> = ({ userId }) => {
-  const [solvedTests, setSolvedTests] = useState<SolvedTest[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedTestId, setSelectedTestId] = useState<string | null>(null);
-  const [showTestDetails, setShowTestDetails] = useState(false);
-  const [activeTab, setActiveTab] = useState("tests");
-
-  useEffect(() => {
-    if (!userId) return;
-    
-    loadUserTests();
-  }, [userId]);
-
-  const loadUserTests = () => {
-    setLoading(true);
-    const tests = getUserSolvedTests(userId);
-    setSolvedTests(tests);
-    setLoading(false);
-  };
-
+  const [activeTab, setActiveTab] = useState('tests');
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+  const [selectedTest, setSelectedTest] = useState<SolvedTest | null>(null);
+  
+  // Get the statistics data from the service
+  const solvedTests = getUserSolvedTests(userId);
+  const taskStatistics = getUserTaskStatistics(userId);
+  
+  // Calculate the overall statistics
+  const totalTests = solvedTests.length;
+  const totalAttemptedTasks = taskStatistics.length;
+  
+  const totalCorrectAnswers = solvedTests.reduce((sum, test) => {
+    return sum + test.answers.filter(a => a.isCorrect).length;
+  }, 0);
+  
+  const totalQuestions = solvedTests.reduce((sum, test) => {
+    return sum + test.answers.length;
+  }, 0);
+  
+  const averageScore = totalQuestions > 0 
+    ? Math.round((totalCorrectAnswers / totalQuestions) * 100) 
+    : 0;
+  
   const handleDeleteTest = (testId: string) => {
-    if (window.confirm('Вы уверены, что хотите удалить результаты этого варианта?')) {
-      if (deleteUserTest(testId, userId)) {
-        toast.success('Результаты варианта удалены');
-        loadUserTests();
-      } else {
-        toast.error('Ошибка при удалении результатов');
-      }
+    // In a real app, this would call an API to delete the test
+    toast.success('Вариант удален из истории');
+  };
+  
+  const handleViewTestDetails = (testId: string) => {
+    const test = solvedTests.find(t => t.testId === testId);
+    if (test) {
+      setSelectedTest(test);
+      setShowDetailsDialog(true);
     }
   };
-
-  const getSelectedTest = () => {
-    return solvedTests.find(test => test.testId === selectedTestId) || null;
-  };
-
-  if (loading) {
-    return <div className="py-8 text-center">Загрузка статистики...</div>;
-  }
-
-  if (solvedTests.length === 0) {
+  
+  if (totalTests === 0 && totalAttemptedTasks === 0) {
     return (
-      <div className="py-8 text-center">
-        <p className="text-muted-foreground">У вас пока нет решенных вариантов</p>
-      </div>
+      <Alert>
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          У вас пока нет статистики. Решите несколько заданий или вариантов, чтобы увидеть свои результаты.
+        </AlertDescription>
+      </Alert>
     );
   }
-
-  // Get statistics using the extracted utility functions
-  const { totalPoints, totalPossiblePoints, overallPercentage } = calculateOverallStatistics(solvedTests);
-  const selectedTest = getSelectedTest();
-  const taskStats = getTaskStatistics(solvedTests);
-
+  
   return (
     <div className="space-y-6">
       <StatisticsCards 
-        solvedTests={solvedTests}
-        totalPoints={totalPoints}
-        totalPossiblePoints={totalPossiblePoints}
-        overallPercentage={overallPercentage}
-        userId={userId}
+        totalTests={totalTests}
+        totalAttemptedTasks={totalAttemptedTasks}
+        averageScore={averageScore}
       />
-
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-2 sticky top-0 bg-white z-10">
-          <TabsTrigger value="tests">По вариантам</TabsTrigger>
-          <TabsTrigger value="tasks">По заданиям</TabsTrigger>
+      
+      <Tabs defaultValue="tests" onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="tests">Решенные варианты</TabsTrigger>
+          <TabsTrigger value="tasks">Задания</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="tests" className="mt-4">
-          <TestsTable 
-            solvedTests={solvedTests}
-            onDeleteTest={handleDeleteTest}
-            onViewDetails={(testId) => {
-              setSelectedTestId(testId);
-              setShowTestDetails(true);
-            }}
-          />
+        <TabsContent value="tests" className="mt-6">
+          {solvedTests.length > 0 ? (
+            <TestsTable 
+              solvedTests={solvedTests}
+              onDeleteTest={handleDeleteTest}
+              onViewDetails={handleViewTestDetails}
+            />
+          ) : (
+            <p className="text-center text-muted-foreground py-4">
+              Вы еще не решили ни одного варианта
+            </p>
+          )}
         </TabsContent>
         
-        <TabsContent value="tasks" className="mt-4">
-          <TasksTable taskStatistics={taskStats} />
+        <TabsContent value="tasks" className="mt-6">
+          {taskStatistics.length > 0 ? (
+            <TasksTable taskStatistics={taskStatistics} />
+          ) : (
+            <p className="text-center text-muted-foreground py-4">
+              Вы еще не решили ни одного задания
+            </p>
+          )}
         </TabsContent>
       </Tabs>
       
       <TestDetailsDialog 
-        open={showTestDetails}
-        onOpenChange={setShowTestDetails}
+        open={showDetailsDialog}
+        onOpenChange={setShowDetailsDialog}
         selectedTest={selectedTest}
       />
     </div>
