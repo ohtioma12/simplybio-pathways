@@ -11,16 +11,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Link } from 'react-router-dom';
+import { TaskStatistic } from './statistics-service';
 
 interface TasksTableProps {
-  taskStatistics: Array<{
-    taskId: number;
-    taskCode: string;
-    taskTitle: string;
-    attempts: number;
-    earnedPoints: number;
-    totalPoints: number;
-  }>;
+  taskStatistics: TaskStatistic[];
 }
 
 const TasksTable: React.FC<TasksTableProps> = ({ taskStatistics }) => {

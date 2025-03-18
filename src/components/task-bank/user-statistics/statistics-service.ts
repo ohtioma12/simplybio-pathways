@@ -1,3 +1,4 @@
+
 import { sampleTasks } from '../data';
 import { UserAnswer as TypesUserAnswer } from '../test-generator/types';
 
@@ -25,14 +26,16 @@ export interface SolvedTest {
   };
 }
 
-// Add this interface for task statistics
+// Updated TaskStatistic interface to match what TasksTable expects
 export interface TaskStatistic {
   taskId: number;
   taskCode: string;
-  title: string;
+  taskTitle: string; // Renamed from title to match expected prop
   attempts: number;
   correctAttempts: number;
   lastAttemptDate: string;
+  earnedPoints: number; // Added to match expected prop
+  totalPoints: number; // Added to match expected prop
 }
 
 // Helper function to convert between UserAnswer formats
@@ -139,16 +142,23 @@ export const getUserTaskStatistics = (userId?: string): TaskStatistic[] => {
         if (!task) return;
         
         const taskCode = answer.taskCode || task.taskCode || '';
+        const taskTitle = task.title || '';
+        
+        // Calculate earned points and total points for this task
+        const earnedPoints = answer.isCorrect ? (answer.points || 1) : 0;
+        const totalPoints = answer.maxPoints || 1;
         
         if (!taskStatsMap.has(taskId)) {
           // Initialize task stats if this is the first encounter
           taskStatsMap.set(taskId, {
             taskId,
             taskCode,
-            title: task.title || '',
+            taskTitle,
             attempts: 1,
             correctAttempts: answer.isCorrect ? 1 : 0,
-            lastAttemptDate: test.completedAt
+            lastAttemptDate: test.completedAt,
+            earnedPoints,
+            totalPoints
           });
         } else {
           // Update existing stats
@@ -159,7 +169,9 @@ export const getUserTaskStatistics = (userId?: string): TaskStatistic[] => {
             correctAttempts: existingStats.correctAttempts + (answer.isCorrect ? 1 : 0),
             lastAttemptDate: new Date(test.completedAt) > new Date(existingStats.lastAttemptDate) 
               ? test.completedAt 
-              : existingStats.lastAttemptDate
+              : existingStats.lastAttemptDate,
+            earnedPoints: existingStats.earnedPoints + earnedPoints,
+            totalPoints: existingStats.totalPoints + totalPoints
           });
         }
       });
