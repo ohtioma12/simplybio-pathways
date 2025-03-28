@@ -102,6 +102,19 @@
   .hover-lift {
     @apply transition-transform duration-300 hover:-translate-y-1;
   }
+  
+  /* New responsive utilities */
+  .responsive-container {
+    @apply w-full px-4 sm:px-6 md:px-8 max-w-full mx-auto;
+  }
+  
+  .responsive-padding {
+    @apply px-3 sm:px-4 md:px-6;
+  }
+  
+  .responsive-text {
+    @apply text-sm sm:text-base md:text-lg;
+  }
 }
 
 /* Reset defaults */
@@ -138,7 +151,7 @@ body {
 
 @media (min-width: 640px) {
   .container {
-    max-width: 640px;
+    max-width: 100%;
     padding-left: 1.5rem;
     padding-right: 1.5rem;
   }
@@ -146,19 +159,19 @@ body {
 
 @media (min-width: 768px) {
   .container {
-    max-width: 768px;
+    max-width: 100%;
   }
 }
 
 @media (min-width: 1024px) {
   .container {
-    max-width: 1024px;
+    max-width: 100%;
   }
 }
 
 @media (min-width: 1280px) {
   .container {
-    max-width: 1280px;
+    max-width: 100%;
   }
 }
 
@@ -177,4 +190,32 @@ input, textarea, select, button {
 img {
   max-width: 100%;
   height: auto;
+}
+
+/* Responsive tables */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Better mobile experience */
+@media (max-width: 640px) {
+  .hide-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .mobile-full-width {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+  }
 }

@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import {
@@ -60,46 +61,53 @@ const TestResults: React.FC<TestResultsProps> = ({ score, answers }) => {
           <CardTitle>Детальные результаты</CardTitle>
         </CardHeader>
         <CardContent className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>№</TableHead>
-                <TableHead>Код задания</TableHead>
-                <TableHead>Ваш ответ</TableHead>
-                <TableHead>Правильный ответ</TableHead>
-                <TableHead>Результат</TableHead>
-                <TableHead className="text-right">Баллы</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {answers.map((answer, index) => (
-                <TableRow key={answer.taskId}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>
-                    <div className="font-medium">{answer.taskCode || `Задание ${answer.taskId}`}</div>
-                  </TableCell>
-                  <TableCell>{answer.answer || '-'}</TableCell>
-                  <TableCell>{answer.correctAnswer || '-'}</TableCell>
-                  <TableCell>
-                    {answer.isCorrect ? (
-                      <span className="flex items-center text-green-600">
-                        <Check className="h-4 w-4 mr-1" />
-                        Верно
-                      </span>
-                    ) : (
-                      <span className="flex items-center text-red-600">
-                        <X className="h-4 w-4 mr-1" />
-                        Неверно
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {answer.isCorrect ? (answer.maxPoints || 1) : 0} / {answer.maxPoints || 1}
-                  </TableCell>
+          <div className="table-responsive">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>№</TableHead>
+                  <TableHead>Код задания</TableHead>
+                  <TableHead>Ваш ответ</TableHead>
+                  <TableHead>Правильный ответ</TableHead>
+                  <TableHead>Результат</TableHead>
+                  <TableHead className="text-right">Баллы</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {answers.map((answer, index) => (
+                  <TableRow key={answer.taskId}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>
+                      <Link 
+                        to={`/task/${answer.taskId}`} 
+                        className="font-medium text-blue-600 hover:underline"
+                      >
+                        {answer.taskCode || `Задание ${answer.taskId}`}
+                      </Link>
+                    </TableCell>
+                    <TableCell>{answer.answer || '-'}</TableCell>
+                    <TableCell>{answer.correctAnswer || '-'}</TableCell>
+                    <TableCell>
+                      {answer.isCorrect ? (
+                        <span className="flex items-center text-green-600">
+                          <Check className="h-4 w-4 mr-1" />
+                          Верно
+                        </span>
+                      ) : (
+                        <span className="flex items-center text-red-600">
+                          <X className="h-4 w-4 mr-1" />
+                          Неверно
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {answer.isCorrect ? (answer.maxPoints || 1) : 0} / {answer.maxPoints || 1}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>

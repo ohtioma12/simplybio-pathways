@@ -56,14 +56,8 @@ const UserStatistics: React.FC<UserStatisticsProps> = ({ userId }) => {
   };
   
   const handleViewTestDetails = (testId: string) => {
-    const test = solvedTests.find(t => t.testId === testId);
-    if (test) {
-      setSelectedTest(test);
-      setShowDetailsDialog(true);
-    } else {
-      // Fallback to redirect to the test statistics page directly
-      navigate(`/test-statistics/${testId}`);
-    }
+    // Direct navigation to the test statistics page
+    navigate(`/profile/statistics/${testId}`);
   };
   
   if (totalTests === 0 && totalAttemptedTasks === 0) {
@@ -116,12 +110,6 @@ const UserStatistics: React.FC<UserStatisticsProps> = ({ userId }) => {
           )}
         </TabsContent>
       </Tabs>
-      
-      <TestDetailsDialog 
-        open={showDetailsDialog}
-        onOpenChange={setShowDetailsDialog}
-        selectedTest={selectedTest}
-      />
     </div>
   );
 };
